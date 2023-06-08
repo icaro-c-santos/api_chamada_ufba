@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    image: mysql:5.7
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - db:/var/lib/mysqlcm
+  db:

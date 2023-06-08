@@ -1,0 +1,63 @@
+# BACK-END DO PROJETO Lista de Compras
+
+Este projeto é o back-end pro Projeto Lista de Compras.
+
+## Pré-requisitos
+
+Certifique-se de ter os seguintes pré-requisitos instalados em sua máquina:
+
+- Node.js
+- Yarn
+- Docker
+
+## Configuração do Ambiente
+
+```shell
+# Clone o repositório para sua máquina local
+git clone https://github.com/seu-usuario/seu-projeto.git
+
+# Navegue até o diretório do projeto
+cd back-end
+
+# Instale as dependências do projeto usando o Yarn
+yarn install
+
+# Crie um arquivo .env na raiz do projeto e defina as variáveis de ambiente necessárias que estão no arquivo env.example
+
+
+# Inicie a aplicação usando o Docker Compose
+docker-compose up -d
+
+```
+
+## Possíveis Problemas
+
+
+Aqui estão alguns problemas comuns que você pode encontrar ao configurar ou executar o projeto, juntamente com suas soluções sugeridas:
+
+### 1. Erro de porta já em uso
+
+Se você encontrar um erro informando que a porta desejada pelo servidor está em uso, pode haver outro processo ou serviço já usando essa porta.
+
+**Solução:**
+- Verifique se você tem algum outro serviço em execução que esteja usando a mesma porta. Pare o serviço em conflito ou altere a porta configurada para o servidor do projeto.
+
+### 2. Problemas de conexão com o banco de dados
+
+Se você estiver enfrentando problemas de conexão com o banco de dados, verifique se as configurações estão corretas e se o banco de dados está em execução.
+
+**Solução:**
+- Verifique se as variáveis de ambiente relacionadas ao banco de dados estão corretamente configuradas no arquivo .env.
+- Verifique se o serviço do banco de dados está em execução. Use o comando `docker-compose ps` para verificar o status dos serviços.
+- Verifique se as configurações do banco de dados no arquivo de configuração estão corretas, incluindo o host, porta, usuário e senha.
+
+### 3. Erros de compilação ou falha ao iniciar o servidor
+
+Se você estiver enfrentando erros de compilação ao executar o projeto ou se o servidor não estiver iniciando corretamente, pode haver problemas com dependências ausentes ou configurações incorretas.
+
+**Solução:**
+- Verifique se todas as dependências foram instaladas corretamente executando `yarn install` novamente.
+- Verifique se todas as configurações estão corretas, como as variáveis de ambiente, arquivos de configuração, etc.
+- Verifique os logs de erro para obter informações mais detalhadas sobre o problema.
+
+
