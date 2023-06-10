@@ -1,5 +1,6 @@
 
 import { buildStudent } from "../mock/builderStudent";
+import { buildSubjects } from "../mock/builderSubjects";
 import { createSubject } from "../repository/disciplina.repository";
 import { createStudent } from "../repository/student.repository";
 import { addStudentInTurma, createTurma } from "../repository/turmaRepository";
@@ -13,23 +14,52 @@ const shuffleArray = (array: any) => {
     return array;
 }
 
+
+const TOTALSTUDENTS = 100000;
+const TOTALTURMAS = 5000;
+
 export const runBuildData = async () => {
 
-
-    const disciplina01 = await createSubject({ name: "BANCO DE DADOS", cargaHoraria: 60 });
-    const disciplina02 = await createSubject({ name: "LABORATORIO DE BANCO DE DADOS", cargaHoraria: 40 });
-    const disciplina03 = await createSubject({ name: "MATEMTICA", cargaHoraria: 80 });
-    const disciplina04 = await createSubject({ name: "INTRODUÇÃO A ADMINISTRAÇÃO", cargaHoraria: 60 });
-
-    const turma01 = await createTurma({ name: "T01", codigoDisciplina: disciplina01 as number })
-    const turma02 = await createTurma({ name: "T02", codigoDisciplina: disciplina02 as number })
-    const turma03 = await createTurma({ name: "T03", codigoDisciplina: disciplina03 as number })
-    const turma04 = await createTurma({ name: "T04", codigoDisciplina: disciplina04 as number })
-
     const idsStudents: string[] = [];
-    for (let i = 0; i < 2000; i++) {
+    const idSubjects: string[] = [];
+    const idSections: string[] = [];
+
+    for (let subject of buildSubjects) {
         try {
+            let idSubject = await createSubject({ name: subject.name, cargaHoraria: subject.cargaHoraria })
+            if (idSubject != null && idSubject != 0) {
+                idSubjects.push(idSubject as string);
+            }
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    }
+
+    for (let i = 0; i < TOTALTURMAS; i++) {
+        try {
+
+            const randomIndex = Math.floor(Math.random() * idSubjects.length);
+            const subjectId = idSubjects[randomIndex];
+
+            let idTurma = await createTurma({
+                name: `T${i + 1}`,
+                codigoDisciplina: parseInt(subjectId)
+            })
+
+            if (idTurma != null && idTurma != 0) {
+                idSections.push(idTurma as string);
+            }
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    }
+
+
+    for (let i = 0; i < TOTALSTUDENTS; i++) {
+        try {
+
             let student = buildStudent();
+
             const idStudnet = await createStudent({
                 name: student.name,
                 cpf: student.cpf,
@@ -37,31 +67,28 @@ export const runBuildData = async () => {
                 matricula: student.matricula,
                 telefone: student.telefone
             })
-            idsStudents.push(student.cpf);
+            if (idStudnet != null) {
+                idsStudents.push(student.cpf);
+            }
+
         } catch (error: any) {
             console.log(error.message);
         }
     }
 
 
+    const newIds = shuffleArray(idsStudents); /// EMBARALHA O ARRAY DE STUDANTES
 
-
-    const newIds = shuffleArray(idsStudents);
-
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < TOTALSTUDENTS; i++) {
         try {
-            await addStudentInTurma(newIds[i], turma01 as string);
-            await addStudentInTurma(newIds[i], turma02 as string);
-            await addStudentInTurma(newIds[i], turma03 as string);
-        } catch (error: any) {
-            console.log(error.message);
-        }
-    }
+            const randomIndex = Math.floor(Math.random() * idSections.length);
+            const sectionId = idSections[randomIndex];
 
-    for (let i = 1000; i < 2000; i++) {
-        try {
-            await addStudentInTurma(newIds[i], turma04 as string);
-            await addStudentInTurma(newIds[i], turma03 as string);
+            await addStudentInTurma(newIds[i], sectionId as string);
+            await addStudentInTurma(newIds[i], sectionId as string);
+            await addStudentInTurma(newIds[i], sectionId as string);
+            await addStudentInTurma(newIds[i], sectionId as string);
+            await addStudentInTurma(newIds[i], sectionId as string);
         } catch (error: any) {
             console.log(error.message);
         }
