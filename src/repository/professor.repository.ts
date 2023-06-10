@@ -22,8 +22,6 @@ export const createProfessor = async (professor: TCreateProfessor) => {
                 return resolve(results.insertId);
             }
         });
-    }).finally(() => {
-        dbConnection.end();
     })
 
 

@@ -1,17 +1,11 @@
-import { createSubject } from "./repository/disciplina.repository";
-import { createProfessor } from "./repository/professor.repository";
+import { buildStudent } from "./mock/builderStudent";
 import { createRoom } from "./repository/room.repository";
-import { createTurma } from "./repository/turmaRepository";
+import { createStudent } from "./repository/student.repository";
+import { addStudentInTurma } from "./repository/turmaRepository";
+import { runBuildData } from "./sql/buildData";
 
-const run = async () => {
-    try {
-        const value = await createRoom({ paf: "2132", numero: 272 });
-        console.log(value);
-    } catch (error: any) {
-        console.log(error.message)
 
-    }
 
-}
 
-run().then();
+
+runBuildData().then();

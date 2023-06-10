@@ -18,8 +18,6 @@ export const createRoom = async (room: TCreateRoom) => {
                 return resolve(idRomm);
             }
         });
-    }).finally(() => {
-        dbConnection.end();
     })
 
 

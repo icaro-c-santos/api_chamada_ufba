@@ -24,11 +24,11 @@ export const validStudent = (student: TCreateStudent): boolean => {
     }
 
     if (student.email == null || student.email.length <= 6) {
-        throw new BusinessExceptions("EMAIL DO ALUNO É INVALIDO VAERIFQUE SE POSSUI PELO MENOS 6 DIGITOS!", "invalidEmailStudent", 400);
+        throw new BusinessExceptions("EMAIL DO ALUNO É INVALIDO VERIFQUE SE POSSUI PELO MENOS 6 DIGITOS!", "invalidEmailStudent", 400);
     }
 
-    if (student.name == null || student.name.length <= 6) {
-        throw new BusinessExceptions("NOME DO ALUNO É INVALIDO VAERIFQUE SE POSSUI PELO MENOS 6 DIGITOS!", "invalidNameStudent", 400);
+    if (student.name == null || student.name.length <= 3) {
+        throw new BusinessExceptions("NOME DO ALUNO É INVALIDO VERIFQUE SE POSSUI PELO MENOS 3 DIGITOS!", "invalidNameStudent", 400);
     }
 
     if (student.matricula == null) {

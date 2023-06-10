@@ -26,11 +26,11 @@ export const validProfessor = (professor: TCreateProfessor): boolean => {
     }
 
     if (professor.email == null || professor.email.length <= 6) {
-        throw new BusinessExceptions("EMAIL DO PROFESSOR É INVALIDO VAERIFQUE SE POSSUI PELO MENOS 6 DIGITOS!", "invalidEmailprofessor", 400);
+        throw new BusinessExceptions("EMAIL DO PROFESSOR É INVALIDO VERIFQUE SE POSSUI PELO MENOS 6 DIGITOS!", "invalidEmailprofessor", 400);
     }
 
-    if (professor.name == null || professor.name.length <= 6) {
-        throw new BusinessExceptions("NOME DO PROFESSOR É INVALIDO VAERIFQUE SE POSSUI PELO MENOS 6 DIGITOS!", "invalidNameprofessor", 400);
+    if (professor.name == null || professor.name.length <= 3) {
+        throw new BusinessExceptions("NOME DO PROFESSOR É INVALIDO VERIFQUE SE POSSUI PELO MENOS 3 DIGITOS!", "invalidNameprofessor", 400);
     }
 
     if (professor.telefone != null && /^\d{8}$/.test(professor.telefone.toString())) {

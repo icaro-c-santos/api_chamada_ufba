@@ -25,8 +25,6 @@ export const createStudent = (student: TCreateStudent) => {
                 return resolve(results.insertId);
             }
         });
-    }).finally(() => {
-        dbConnection.end();
     })
 
 

@@ -15,8 +15,6 @@ export const createSubject = async (subject: TCreateSubject) => {
                 return resolve(results.insertId);
             }
         });
-    }).finally(() => {
-        dbConnection.end();
     })
 
 

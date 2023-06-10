@@ -19,10 +19,7 @@ export const createTurma = async (turma: TCreateTurma) => {
                 return resolve(results.insertId);
             }
         });
-    }).finally(() => {
-        dbConnection.end();
     })
-
 
 
 
@@ -33,7 +30,7 @@ export const addStudentInTurma = async (studentId: string, turmaId: string) => {
     const sql = 'INSERT INTO turma_aluno (fk_turma_fk_aluno,fk_cod_turma,fk_cpf_aluno) VALUES (?, ?,?)';
     return new Promise((resolve, reject) => {
 
-        const pk = studentId.concat(turmaId);
+        const pk = `${studentId}${turmaId}`;
 
         dbConnection.query(sql, [pk, turmaId, studentId], (error, results: any) => {
             if (error) {
@@ -56,8 +53,6 @@ export const addStudentInTurma = async (studentId: string, turmaId: string) => {
                 return resolve(results.insertId);
             }
         });
-    }).finally(() => {
-        dbConnection.end();
     })
 }
 
