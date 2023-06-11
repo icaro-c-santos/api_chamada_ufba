@@ -78,3 +78,34 @@ export const addHorarioRommInTurma = async (idSection: string, idHorario: string
         });
     })
 }
+
+
+export const addProfessorInTurma = async (professorId: string, turmaId: string) => {
+    const sql = 'INSERT INTO turma_professor (fk_turma_fk_professor,fk_cod_turma,fk_cpf_professor) VALUES (?, ?,?)';
+    return new Promise((resolve, reject) => {
+
+        const pk = `${professorId}${turmaId}`;
+
+        dbConnection.query(sql, [pk, turmaId, professorId], (error, results: any) => {
+            if (error) {
+
+                if (error?.code == `ER_DUP_ENTRY` && error.message.includes("for key 'PRIMARY'")) {
+                    return reject(new BusinessExceptions("Professor já cadastrado nessa turma!", "duplicateMatricula", 404));
+                }
+
+                if (error?.code == `ER_NO_REFERENCED_ROW_2` && error.message.includes("FOREIGN KEY (`fk_cpf_professor`) REFERENCES `professor` (`cpf`))")) {
+                    return reject(new BusinessExceptions("Professor não encontrado!", "duplicateMatricula", 404));
+                }
+
+
+                if (error?.code == `ER_NO_REFERENCED_ROW_2` && error.message.includes("FOREIGN KEY (`fk_cod_turma`) REFERENCES `turma` (`codigo`))")) {
+                    return reject(new BusinessExceptions("Turma não encontrada!", "duplicateMatricula", 404));
+                }
+
+                return reject(error);
+            } else {
+                return resolve(results.insertId);
+            }
+        });
+    })
+}

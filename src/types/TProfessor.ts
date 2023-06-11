@@ -3,7 +3,6 @@ import { BusinessExceptions } from "../exceptions";
 
 export type TProfessor = {
     cpf: string,
-    matricula: string,
     name: string,
     email: string,
     telefone: number | null

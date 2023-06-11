@@ -2,10 +2,12 @@
 import { buildRoom } from "../mock/builderRoom";
 import { buildStudent } from "../mock/builderStudent";
 import { buildSubjects } from "../mock/builderSubjects";
+import { buildProfessor } from "../mock/builderTeacher";
 import { createSubject } from "../repository/disciplina.repository";
+import { createProfessor } from "../repository/professor.repository";
 import { createRoom } from "../repository/room.repository";
 import { createStudent } from "../repository/student.repository";
-import { addHorarioRommInTurma, addStudentInTurma, createTurma } from "../repository/turmaRepository";
+import { addHorarioRommInTurma, addProfessorInTurma, addStudentInTurma, createTurma } from "../repository/turmaRepository";
 import { TClass } from "../types/TClass";
 
 
@@ -23,15 +25,16 @@ const TOTALTURMAS = 1000;
 const TOTALSALAS = 100;
 const TOTALPAF = 10;
 const TOTALMATRICULAS = 5;
-const TOTALHORARIOSTURMA = 8;
-
+const TOTALHORARIOSTURMA = 6;
+const TOTALPROFESSOR = 800;
+const TOTALTURMASPROFESSOR = 4;
 export const runBuildData = async () => {
 
     const idsStudents: string[] = [];
     const idSubjects: string[] = [];
     const idSections: string[] = [];
     const idRomms: string[] = [];
-    const listAulas: TClass[] = [];
+    const listProfessor: string[] = [];
     for (let subject of buildSubjects) {
         try {
             let idSubject = await createSubject({ name: subject.name, cargaHoraria: subject.cargaHoraria })
@@ -79,6 +82,28 @@ export const runBuildData = async () => {
         }
     }
 
+
+    for (let i = 0; i < TOTALPROFESSOR; i++) {
+        try {
+
+            let professor = buildProfessor();
+
+            let idProfessor = await createProfessor({
+                name: professor.name,
+                cpf: professor.cpf,
+                email: professor.email,
+                telefone: professor.telefone
+            })
+            if (idProfessor != null) {
+                idsStudents.push(professor.cpf);
+            }
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    }
+
+
     for (let i = 0; i < TOTALSTUDENTS; i++) {
         try {
 
@@ -100,6 +125,21 @@ export const runBuildData = async () => {
         }
     }
 
+
+    for (let professor of listProfessor) {
+        for (let j = 0; j < TOTALTURMASPROFESSOR; j++) {
+            try {
+                let randomIndex = Math.floor(Math.random() * idSections.length);
+                let sectionId = idSections[randomIndex];
+                await addProfessorInTurma(professor, sectionId as string);
+            } catch (error: any) {
+                console.log(error.message);
+            }
+
+        }
+    }
+
+    let erro = false;
     for (let sectionId of idSections) {
         for (let j = 0; j < TOTALHORARIOSTURMA; j++) {
             try {
@@ -111,6 +151,13 @@ export const runBuildData = async () => {
 
             } catch (error: any) {
                 console.log(error.message);
+                if (erro) {
+                    j++;
+                    erro = false;
+                } else {
+                    j--;
+                    erro = true;
+                }
             }
         }
     }
@@ -118,7 +165,7 @@ export const runBuildData = async () => {
 
     const newIds = shuffleArray(idsStudents); /// EMBARALHA O ARRAY DE STUDANTES
 
-    for (let i = 0; i < TOTALSTUDENTS; i++) {
+    for (let i = 0; i < newIds.length; i++) {
         for (let j = 0; j < TOTALMATRICULAS; j++) {
             try {
                 let randomIndex = Math.floor(Math.random() * idSections.length);

@@ -160,3 +160,7 @@ INSERT INTO horario (hora_inicio, hora_fim, dia, carga_horaria) VALUES
 ('21:40:00', '23:00:00', 'Sexta-feira', 2);
 
 
+INSERT INTO status (id,value) VALUES
+(1,"presente"),
+(2,"ausente"),
+(3,"abonado");
