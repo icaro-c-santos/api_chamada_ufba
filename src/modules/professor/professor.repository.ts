@@ -1,12 +1,12 @@
 import { ResultSetHeader } from "mysql2";
 import MysqlClient from "../../data/mysqlClient";
 import { BusinessExceptions } from "../../exceptions/BusinessExceptions";
-import { createStudentDto } from "./models/createStudent.dto";
-import { Student } from "./models/student.entity";
+import { createProfessorDto } from "./models/createProfessor.dto";
+import { Professor } from "./models/professor.entity";
 import { Pagination } from "../../types/Pagination";
-import { UpdateStudentDto } from "./models/updateStudent.dto";
+import { UpdateProfessorDto } from "./models/updateProfessor.dto";
 
-export default class StudentRepository {
+export default class ProfessorRepository {
 
     protected mysqlClient: MysqlClient;
 
@@ -14,7 +14,7 @@ export default class StudentRepository {
         this.mysqlClient = new MysqlClient();
     }
 
-    async createStudent(createStudentDto: createStudentDto): Promise<Student> {
+    async createProfessor(createProfessorDto: createProfessorDto): Promise<Professor> {
         const connection = this.mysqlClient.connection();
         return new Promise((resolve, reject) => {
             connection.beginTransaction((err) => {
@@ -25,7 +25,7 @@ export default class StudentRepository {
                 }
 
                 const sqlPerson = `INSERT INTO persons (cpf,email,name,phone) VALUES (?,?,?,?)`;
-                const sqlPersonParameters = Object.values(createStudentDto);
+                const sqlPersonParameters = Object.values(createProfessorDto);
                 connection.query(sqlPerson, sqlPersonParameters, (err, results) => {
                     if (err) {
                         connection.rollback(() => {
@@ -39,9 +39,9 @@ export default class StudentRepository {
                         return;
                     }
 
-                    const sqlStudent = `INSERT INTO students (cpf) VALUES(?)`;
-                    const sqlStudentParameters = [createStudentDto.cpf];
-                    connection.query(sqlStudent, sqlStudentParameters, (err, results) => {
+                    const sqlProfessor = `INSERT INTO professors (cpf) VALUES(?)`;
+                    const sqlProfessorParameters = [createProfessorDto.cpf];
+                    connection.query(sqlProfessor, sqlProfessorParameters, (err, results) => {
                         if (err) {
                             connection.rollback(() => {
                                 connection.end();
@@ -61,7 +61,7 @@ export default class StudentRepository {
 
                                 const { insertId } = results as ResultSetHeader;
                                 resolve({
-                                    ...createStudentDto, matricula: insertId
+                                    ...createProfessorDto, codigo: insertId
                                 });
                             }
                         });
@@ -71,37 +71,37 @@ export default class StudentRepository {
         });
     }
 
-    async getAllStudent({ page = 1, pageSize = 25 }: Pagination = {}): Promise<Student[]> {
+    async getAllProfessor({ page = 1, pageSize = 25 }: Pagination = {}): Promise<Professor[]> {
 
         const offset = (page - 1) * pageSize;
-        const sql = `select * from students inner join persons on students.cpf = persons.cpf LIMIT ? OFFSET ?;`
+        const sql = `select * from professors inner join persons on professors.cpf = persons.cpf LIMIT ? OFFSET ?;`
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [pageSize, offset]);
-        return results as Student[];
+        return results as Professor[];
     }
 
-    async getStudentByName(data: { nameStudent: string } & Pagination): Promise<Student[]> {
-        const { page = 1, pageSize = 25, nameStudent } = data;
-        const namePattern = `%${nameStudent}%`
+    async getProfessorByName(data: { nameProfessor: string } & Pagination): Promise<Professor[]> {
+        const { page = 1, pageSize = 25, nameProfessor } = data;
+        const namePattern = `%${nameProfessor}%`
         const offset = (page - 1) * pageSize;
-        const sql = `select * from students inner join persons on students.cpf = persons.cpf where name like ? LIMIT ? OFFSET ?;`
+        const sql = `select * from professors inner join persons on professors.cpf = persons.cpf where name like ? LIMIT ? OFFSET ?;`
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [namePattern, pageSize, offset]);
-        return results as Student[];
+        return results as Professor[];
     }
 
-    async getStudentByCpf(studentCpf: string): Promise<Student | null> {
-        const sql = `select * from students inner join persons on students.cpf = persons.cpf where students.cpf = ?;`
-        const results = await this.mysqlClient.executeSQLQueryParams(sql, [studentCpf]);
-        return results[0] as Student || null;
+    async getProfessorByCpf(ProfessorCpf: string): Promise<Professor | null> {
+        const sql = `select * from professors inner join persons on professors.cpf = persons.cpf where professors.cpf = ?;`
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [ProfessorCpf]);
+        return results[0] as Professor || null;
     }
 
-    async getStudentByEnrolment(studentEnrolment: string): Promise<Student | null> {
-        const sql = `select * from students inner join persons on students.cpf = persons.cpf where students.enrolments = ?;`
-        const [error, results, fields] = await this.mysqlClient.executeSQLQueryParams(sql, [studentEnrolment]);
-        return results[0] as Student || null;
+    async getProfessorByEnrolment(ProfessorEnrolment: string): Promise<Professor | null> {
+        const sql = `select * from professors inner join persons on professors.cpf = persons.cpf where professors.enrolments = ?;`
+        const [error, results, fields] = await this.mysqlClient.executeSQLQueryParams(sql, [ProfessorEnrolment]);
+        return results[0] as Professor || null;
     }
 
-    async updateStudent(cpfStudent: string, updateStudentDto: UpdateStudentDto): Promise<boolean> {
-        const { name, email, phone } = updateStudentDto;
+    async updateProfessor(cpfProfessor: string, updateProfessorDto: UpdateProfessorDto): Promise<boolean> {
+        const { name, email, phone } = updateProfessorDto;
         const values: (string | number)[] = [];
         const fieldsToUpdate: string[] = [];
 
@@ -121,14 +121,14 @@ export default class StudentRepository {
         }
 
         const sql = `UPDATE persons SET ${fieldsToUpdate.join(', ')} WHERE cpf = ?`;
-        values.push(cpfStudent);
+        values.push(cpfProfessor);
         const results = await this.mysqlClient.executeSQLQueryParams(sql, values) as unknown as ResultSetHeader;
         return results.affectedRows >= 1;
     }
 
-    async deleteStudent(studentCpf: string): Promise<boolean> {
-        const sql = `delete from students where cpf = ?;`;
-        const results = await this.mysqlClient.executeSQLQueryParams(sql, [studentCpf]) as unknown as ResultSetHeader;
+    async deleteProfessor(ProfessorCpf: string): Promise<boolean> {
+        const sql = `delete from professors where cpf = ?;`;
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [ProfessorCpf]) as unknown as ResultSetHeader;
         return results.affectedRows >= 1;
     }
 

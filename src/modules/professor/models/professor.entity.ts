@@ -7,6 +7,6 @@ export class Person {
 
 }
 
-export class Student extends Person {
-    matricula: number
+export class Professor extends Person {
+    codigo: number
 }

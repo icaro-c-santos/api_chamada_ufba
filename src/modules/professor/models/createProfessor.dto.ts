@@ -1,7 +1,7 @@
 
 import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
 
-export class createStudentDto {
+export class createProfessorDto {
 
     @IsNotEmpty()
     @MaxLength(7)

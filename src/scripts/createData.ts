@@ -1,5 +1,5 @@
 import { FieldPacket, QueryError, RowDataPacket } from "mysql2";
-import { mysqlClient } from "../data/mysqlClient";
+import MysqlClient from "../data/mysqlClient";
 import fs from 'fs';
 import path from "path";
 import { error } from "console";
@@ -16,6 +16,7 @@ const createData = async () => {
 
     const sqlStatements = sqlContent.split(';').filter(statement => statement.trim() !== '');
 
+    const mysqlClient = new MysqlClient();
     for (let sql of sqlStatements) {
         try {
             await mysqlClient.executeSQLQuery(sql);
