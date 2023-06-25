@@ -61,7 +61,7 @@ export default class ProfessorRepository {
 
                                 const { insertId } = results as ResultSetHeader;
                                 resolve({
-                                    ...createProfessorDto, codigo: insertId
+                                    ...createProfessorDto, code: insertId
                                 });
                             }
                         });

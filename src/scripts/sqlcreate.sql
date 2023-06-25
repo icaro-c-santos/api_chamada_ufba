@@ -1,7 +1,7 @@
 CREATE TABLE `professors` (
-	`codigo` INT NOT NULL AUTO_INCREMENT,
+	`code` INT NOT NULL AUTO_INCREMENT,
 	`cpf` varchar(255) NOT NULL UNIQUE,
-	PRIMARY KEY (`codigo`)
+	PRIMARY KEY (`code`)
 );
 
 CREATE TABLE `persons` (
@@ -13,9 +13,9 @@ CREATE TABLE `persons` (
 );
 
 CREATE TABLE `students` (
-	`enrolments` INT NOT NULL AUTO_INCREMENT,
+	`enrolment` INT NOT NULL AUTO_INCREMENT,
 	`cpf` varchar(255) NOT NULL UNIQUE,
-	PRIMARY KEY (`enrolments`)
+	PRIMARY KEY (`enrolment`)
 );
 
 CREATE TABLE `rooms` (
@@ -23,6 +23,21 @@ CREATE TABLE `rooms` (
     `number` INT NOT NULL,
     `code` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`code`)
+);
+
+CREATE TABLE `subjects` (
+	`code` INT NOT NULL AUTO_INCREMENT,
+	`name` varchar(255) NOT NULL,
+	`subject_load` BIGINT NOT NULL,
+	PRIMARY KEY (`code`)
+);
+
+CREATE TABLE `schedules` (
+	`code` INT NOT NULL AUTO_INCREMENT,
+	`start_time` BIGINT NOT NULL,
+	`end_time` BIGINT NOT NULL,
+	`day` INT NOT NULL,
+	PRIMARY KEY (`code`)
 );
 
 ALTER TABLE `professors` ADD CONSTRAINT `professors_fk0` FOREIGN KEY (`cpf`) REFERENCES `persons`(`cpf`) ON DELETE CASCADE;

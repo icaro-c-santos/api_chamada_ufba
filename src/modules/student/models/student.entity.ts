@@ -8,5 +8,5 @@ export class Person {
 }
 
 export class Student extends Person {
-    matricula: number
+    enrolment: number
 }

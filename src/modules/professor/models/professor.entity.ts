@@ -8,5 +8,5 @@ export class Person {
 }
 
 export class Professor extends Person {
-    codigo: number
+    code: number
 }

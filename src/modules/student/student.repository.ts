@@ -61,7 +61,7 @@ export default class StudentRepository {
 
                                 const { insertId } = results as ResultSetHeader;
                                 resolve({
-                                    ...createStudentDto, matricula: insertId
+                                    ...createStudentDto, enrolment: insertId
                                 });
                             }
                         });
