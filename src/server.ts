@@ -11,6 +11,7 @@ import RoomRepository from "./modules/room/room.repository";
 dotenv.config();
 config();
 const app = express();
+const PORT = process.env.NODE_LOCAL_PORT
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -24,6 +25,6 @@ app.use(ErrorMiddleware);
 app.listen(process.env.NODE_LOCAL_PORT, () => {
 
   console.log(
-    `Express started at http://localhost:${process.env.NODE_LOCAL_PORT}`
+    `Express started at http://localhost:${PORT}`
   );
 });
