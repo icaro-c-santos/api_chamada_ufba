@@ -6,6 +6,7 @@ import Section from "./models/section.entity";
 import { Professor } from "../professor/models/professor.entity";
 import { Student } from "../student/models/student.entity";
 import { CreateScheduleDto } from "../schedule/models/createSchedule.dto";
+import { BusinessExceptions } from "../../exceptions/BusinessExceptions";
 
 export interface SectionIncludes {
     professors?: boolean,
@@ -55,70 +56,50 @@ export default class SectionRepository {
         return results;
     }
 
-    async addStudentInSection(sectionCode: number, studentEnrolment: number): Promise<boolean> {
-        try {
-
-        } catch (error) {
-
-        }
-
-        return false;
-    }
-
-    async removeStudentInSection(sectionCode: number, studentEnrolment: number): Promise<boolean> {
-        try {
-
-        } catch (error) {
-
-        }
-
-        return false;
-    }
-
     async addProfessorInSection(sectionCode: number, professorCode: number): Promise<boolean> {
 
         try {
-
-        } catch (error) {
-
+            const sql = `INSERT INTO professors_sections (professorCode,sectionCode) values (?,?);`;
+            const results = await this.mysqlClient.executeSQLQueryParams(sql, [professorCode, sectionCode]) as unknown as ResultSetHeader;
+            return results.affectedRows >= 1;
+        } catch (error: any) {
+            if (error?.code && error.code == "ER_DUP_ENTRY") {
+                new BusinessExceptions("professor já existe nessa turma", "duplicateEntity", 400);
+            }
+            throw error
         }
 
-        return false;
     }
 
     async removeProfessorInSection(sectionCode: number, professorCode: number): Promise<boolean> {
+        const sql = `delete from professors_sections where professorCode = ? AND sectionCode = ?;`;
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [professorCode, sectionCode]) as unknown as ResultSetHeader;
+        return results.affectedRows >= 1;
+    }
+
+    async addStudentInSection(sectionCode: number, studentEnrolment: number): Promise<boolean> {
 
         try {
-
-        } catch (error) {
-
+            const sql = `INSERT INTO students_sections (studentEnrolment,sectionCode) values (?,?);`;
+            const results = await this.mysqlClient.executeSQLQueryParams(sql, [studentEnrolment, sectionCode]) as unknown as ResultSetHeader;
+            return results.affectedRows >= 1;
+        } catch (error: any) {
+            if (error?.code && error.code == "ER_DUP_ENTRY") {
+                new BusinessExceptions("estudante já existe nessa turma", "duplicateEntity", 400);
+            }
+            throw error
         }
 
-        return false;
     }
 
-    async addScheduleInSection(sectionCode: number, createSectionDto: CreateScheduleDto): Promise<boolean> {
-
-        try {   
-
-
-        } catch (error) {
-
-        }
-
-        return false;
+    async removeStudentInSection(sectionCode: number, studentEnrolment: number): Promise<boolean> {
+        const sql = `delete from students_sections where studentEnrolment = ? AND sectionCode = ?;`;
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [studentEnrolment, sectionCode]) as unknown as ResultSetHeader;
+        return results.affectedRows >= 1;
     }
-    
-    async deleteScheduleInSection(sectionCode: number, scheduleCode: number): Promise<boolean> {
 
-        try {
 
-        } catch (error) {
 
-        }
-
-        return false;
-    }
 
 
 } 

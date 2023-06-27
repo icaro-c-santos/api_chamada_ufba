@@ -37,9 +37,9 @@ CREATE TABLE `schedules` (
 	`start_time` INT NOT NULL,
 	`end_time` INT NOT NULL,
 	`day` INT NOT NULL,
-	`room` INT NOT NULL,
-	`section` INT NOT NULL,
-	PRIMARY KEY (`start_time`,`end_time`,`day`,`room`,`section`)
+	`sectionCode` INT NOT NULL,
+	`roomCode` INT NOT NULL,
+	PRIMARY KEY (`start_time`,`end_time`,`day`,`sectionCode`,`roomCode`)
 );
 
 CREATE TABLE `students_sections` (
@@ -56,10 +56,10 @@ CREATE TABLE `sections` (
 
 CREATE TABLE `presences` (
 	`status` INT NOT NULL,
-	`student` INT NOT NULL,
 	`schedule` INT NOT NULL,
+	`student` INT NOT NULL,
 	`date` DATE NOT NULL,
-	PRIMARY KEY (`student`,`schedule`,`date`)
+	PRIMARY KEY (`schedule`,`student`,`date`)
 );
 
 CREATE TABLE `status` (
@@ -78,11 +78,11 @@ ALTER TABLE `professors` ADD CONSTRAINT `professors_fk0` FOREIGN KEY (`cpf`) REF
 
 ALTER TABLE `students` ADD CONSTRAINT `students_fk0` FOREIGN KEY (`cpf`) REFERENCES `persons`(`cpf`) ON DELETE CASCADE;
 
-ALTER TABLE `schedules` ADD CONSTRAINT `schedules_fk0` FOREIGN KEY (`room`) REFERENCES `rooms`(`code`) ON DELETE CASCADE;
+ALTER TABLE `schedules` ADD CONSTRAINT `schedules_fk0` FOREIGN KEY (`sectionCode`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
 
-ALTER TABLE `schedules` ADD CONSTRAINT `schedules_fk1` FOREIGN KEY (`section`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
+ALTER TABLE `schedules` ADD CONSTRAINT `schedules_fk1` FOREIGN KEY (`roomCode`) REFERENCES `rooms`(`code`) ON DELETE CASCADE;
 
-ALTER TABLE `students_sections` ADD CONSTRAINT `students_sections_fk0` FOREIGN KEY (`studentEnrolment`) REFERENCES `students`(`enrolment`) ON DELETE CASCADE;
+ALTER TABLE `students_sections` ADD CONSTRAINT `students_sections_fk0` FOREIGN KEY (`studentEnrolment`) REFERENCES `students`(`enrolment`);
 
 ALTER TABLE `students_sections` ADD CONSTRAINT `students_sections_fk1` FOREIGN KEY (`sectionCode`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
 
@@ -90,13 +90,16 @@ ALTER TABLE `sections` ADD CONSTRAINT `sections_fk0` FOREIGN KEY (`subject`) REF
 
 ALTER TABLE `presences` ADD CONSTRAINT `presences_fk0` FOREIGN KEY (`status`) REFERENCES `status`(`id`) ON DELETE CASCADE;
 
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk1` FOREIGN KEY (`student`) REFERENCES `students_sections`(`studentEnrolment`) ON DELETE CASCADE;
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk1` FOREIGN KEY (`schedule`) REFERENCES `schedules`(`code`) ON DELETE CASCADE;
 
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk2` FOREIGN KEY (`schedule`) REFERENCES `schedules`(`code`) ON DELETE CASCADE;
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk2` FOREIGN KEY (`student`) REFERENCES `students_sections`(`studentEnrolment`) ON DELETE CASCADE;
 
 ALTER TABLE `professors_sections` ADD CONSTRAINT `professors_sections_fk0` FOREIGN KEY (`professorCode`) REFERENCES `professors`(`code`) ON DELETE CASCADE;
 
 ALTER TABLE `professors_sections` ADD CONSTRAINT `professors_sections_fk1` FOREIGN KEY (`sectionCode`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
+
+
+
 
 
 

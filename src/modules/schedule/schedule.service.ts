@@ -8,10 +8,8 @@ export default class ScheduleService {
 
     protected scheduleRepository: ScheduleRepository
 
-
     constructor() {
         this.scheduleRepository = new ScheduleRepository();
-
     }
 
     async create(createScheduleDto: CreateScheduleDto): Promise<number> {

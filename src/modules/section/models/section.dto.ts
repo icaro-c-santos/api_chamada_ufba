@@ -1,6 +1,6 @@
 
 import { Professor } from "../../professor/models/professor.entity";
-import { ScheduleDto } from "../schedule/models/schedule.dto";
+import { ScheduleDto } from "../../schedule/models/schedule.dto";
 import { Student } from "../../student/models/student.entity";
 import Subject from "../../subject/models/subject.entity";
 

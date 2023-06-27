@@ -4,6 +4,6 @@ export default class Schedule {
     start_time: number
     end_time: number
     day: number
-    section:number
-    room:number
+    sectionCode: number
+    roomCode: number
 }
