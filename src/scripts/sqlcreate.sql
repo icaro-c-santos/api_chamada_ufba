@@ -8,7 +8,7 @@ CREATE TABLE `persons` (
 	`cpf` varchar(255) NOT NULL,
 	`name` varchar(255) NOT NULL,
 	`email` varchar(255) NOT NULL,
-	`phone` BIGINT,
+	`phone` INT NOT NULL,
 	PRIMARY KEY (`cpf`)
 );
 
@@ -19,27 +19,89 @@ CREATE TABLE `students` (
 );
 
 CREATE TABLE `rooms` (
-    `paf` VARCHAR(255) NOT NULL,
-    `number` INT NOT NULL,
-    `code` VARCHAR(255) NOT NULL,
-    PRIMARY KEY (`code`)
+	`code` INT NOT NULL AUTO_INCREMENT UNIQUE,
+	`paf` varchar(255) NOT NULL,
+	`number` INT NOT NULL,
+	PRIMARY KEY (`paf`,`number`)
 );
 
 CREATE TABLE `subjects` (
 	`code` INT NOT NULL AUTO_INCREMENT,
 	`name` varchar(255) NOT NULL,
-	`subject_load` BIGINT NOT NULL,
+	`subject_load` INT NOT NULL,
 	PRIMARY KEY (`code`)
 );
 
 CREATE TABLE `schedules` (
-	`code` INT NOT NULL AUTO_INCREMENT,
-	`start_time` BIGINT NOT NULL,
-	`end_time` BIGINT NOT NULL,
+	`code` INT NOT NULL AUTO_INCREMENT UNIQUE,
+	`start_time` INT NOT NULL,
+	`end_time` INT NOT NULL,
 	`day` INT NOT NULL,
+	`room` INT NOT NULL,
+	`section` INT NOT NULL,
+	PRIMARY KEY (`start_time`,`end_time`,`day`,`room`,`section`)
+);
+
+CREATE TABLE `students_sections` (
+	`studentEnrolment` INT NOT NULL AUTO_INCREMENT,
+	`sectionCode` INT NOT NULL,
+	PRIMARY KEY (`studentEnrolment`,`sectionCode`)
+);
+
+CREATE TABLE `sections` (
+	`code` INT NOT NULL AUTO_INCREMENT,
+	`subject` INT NOT NULL,
 	PRIMARY KEY (`code`)
+);
+
+CREATE TABLE `presences` (
+	`status` INT NOT NULL,
+	`student` INT NOT NULL,
+	`schedule` INT NOT NULL,
+	`date` DATE NOT NULL,
+	PRIMARY KEY (`student`,`schedule`,`date`)
+);
+
+CREATE TABLE `status` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`value` varchar(255) NOT NULL,
+	PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `professors_sections` (
+	`professorCode` INT NOT NULL,
+	`sectionCode` INT NOT NULL,
+	PRIMARY KEY (`professorCode`,`sectionCode`)
 );
 
 ALTER TABLE `professors` ADD CONSTRAINT `professors_fk0` FOREIGN KEY (`cpf`) REFERENCES `persons`(`cpf`) ON DELETE CASCADE;
 
 ALTER TABLE `students` ADD CONSTRAINT `students_fk0` FOREIGN KEY (`cpf`) REFERENCES `persons`(`cpf`) ON DELETE CASCADE;
+
+ALTER TABLE `schedules` ADD CONSTRAINT `schedules_fk0` FOREIGN KEY (`room`) REFERENCES `rooms`(`code`) ON DELETE CASCADE;
+
+ALTER TABLE `schedules` ADD CONSTRAINT `schedules_fk1` FOREIGN KEY (`section`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
+
+ALTER TABLE `students_sections` ADD CONSTRAINT `students_sections_fk0` FOREIGN KEY (`studentEnrolment`) REFERENCES `students`(`enrolment`) ON DELETE CASCADE;
+
+ALTER TABLE `students_sections` ADD CONSTRAINT `students_sections_fk1` FOREIGN KEY (`sectionCode`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
+
+ALTER TABLE `sections` ADD CONSTRAINT `sections_fk0` FOREIGN KEY (`subject`) REFERENCES `subjects`(`code`) ON DELETE CASCADE;
+
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk0` FOREIGN KEY (`status`) REFERENCES `status`(`id`) ON DELETE CASCADE;
+
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk1` FOREIGN KEY (`student`) REFERENCES `students_sections`(`studentEnrolment`) ON DELETE CASCADE;
+
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk2` FOREIGN KEY (`schedule`) REFERENCES `schedules`(`code`) ON DELETE CASCADE;
+
+ALTER TABLE `professors_sections` ADD CONSTRAINT `professors_sections_fk0` FOREIGN KEY (`professorCode`) REFERENCES `professors`(`code`) ON DELETE CASCADE;
+
+ALTER TABLE `professors_sections` ADD CONSTRAINT `professors_sections_fk1` FOREIGN KEY (`sectionCode`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
+
+
+
+
+
+
+
+

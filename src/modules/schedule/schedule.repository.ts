@@ -11,7 +11,7 @@ export interface FiltersSchedule extends Pagination {
     day?: number
 
 }
-export default class RoomRepository {
+export default class ScheduleRepository {
 
     protected mysqlClient: MysqlClient;
     constructor() {

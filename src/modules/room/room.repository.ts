@@ -14,22 +14,23 @@ export default class RoomRepository {
 
     async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
         const { paf, number } = createRoomDto;
-        const sql = `INSERT INTO rooms (code,paf,number) values (?, ?,?);`;
-        const code = `${paf}_${number}`;
+        const sql = `INSERT INTO rooms (paf,number) values (?, ?);`;
 
         try {
-            await this.mysqlClient.executeSQLQueryParams(sql, [code, paf, number]);
+            const { insertId } = await this.mysqlClient.executeSQLQueryParams(sql, [paf, number]) as unknown as ResultSetHeader;
+            return {
+                code: insertId,
+                paf: paf,
+                number: number,
+            }
         } catch (error: any) {
             if (error.code != null && error.code == "ER_DUP_ENTRY") {
                 throw new BusinessExceptions("SALA JÁ EXISTE", "duplicateEntity", 400);
             }
+
+            throw error
         }
 
-        return {
-            code: code,
-            paf: paf,
-            number: number,
-        }
     }
 
     async getAllRooms({ page = 1, pageSize = 25 }: Pagination = {}): Promise<Room[]> {

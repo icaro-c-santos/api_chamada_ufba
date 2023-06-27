@@ -1,7 +1,7 @@
 
 
 export default class Room {
-    code: string
+    code: number
     paf: string
     number: number
 }
