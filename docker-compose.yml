@@ -14,5 +14,11 @@ services:
       - '3306'
     volumes:
       - db:/var/lib/mysqlcm
+  api:
+    build: . 
+    restart: always 
+    ports: 
+      - ${NODE_LOCAL_PORT}:${NODE_LOCAL_PORT}
 volumes:
   db:
+
