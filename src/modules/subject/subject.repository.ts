@@ -4,7 +4,7 @@ import { Pagination } from "../../types/Pagination";
 import { CreateSubjectDto } from "./models/createSubject.dto";
 import Subject from "./models/subject.entity";
 
-export default class RoomRepository {
+export default class SubjectRepository {
 
     protected mysqlClient: MysqlClient;
     constructor() {

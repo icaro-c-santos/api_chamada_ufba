@@ -30,6 +30,14 @@ docker-compose up -d
 
 ```
 
+# Populando o banco de dados
+```
+1 - crie um banco com o nome "banco_api"
+2 - rode o comando yarn build-data para criar as tabelas e relações no banco.
+3 - rode o comando yarn build-mock para popular o banco
+
+```
+
 ## Possíveis Problemas
 
 

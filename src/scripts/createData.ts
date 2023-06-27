@@ -2,8 +2,6 @@ import { FieldPacket, QueryError, RowDataPacket } from "mysql2";
 import MysqlClient from "../data/mysqlClient";
 import fs from 'fs';
 import path from "path";
-import { error } from "console";
-
 
 const createData = async () => {
     const filePath = path.resolve(__dirname, 'sqlcreate.sql');

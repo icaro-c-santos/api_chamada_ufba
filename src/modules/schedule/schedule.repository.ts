@@ -18,16 +18,17 @@ export default class ScheduleRepository {
         this.mysqlClient = new MysqlClient();
     }
 
-    async createSchedule(createScheduleDto: CreateScheduleDto): Promise<ScheduleDto> {
-        const { start_time, end_time, day } = createScheduleDto;
-        const sql = `INSERT INTO schedules (start_time,end_time,day) values (?,?,?);`;
-        const results = await this.mysqlClient.executeSQLQueryParams(sql, [start_time, end_time, day]) as unknown as ResultSetHeader;
-        return new ScheduleDto({ code: results.insertId, start_time, end_time, day });
+    async createSchedule(createScheduleDto: CreateScheduleDto): Promise<number> {
+
+        const { day, start_time, end_time, roomCode, sectionCode } = createScheduleDto;
+        const sql = `INSERT INTO schedules (start_time,end_time,day,sectionCode,roomCode) values (?,?,?,?,?);`;
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [start_time, end_time, day, sectionCode, roomCode]) as unknown as ResultSetHeader;
+        return results.insertId as number;
     }
 
     async getAllSchedules({ page = 1, pageSize = 25 }: Pagination = {}): Promise<ScheduleDto[]> {
         const offset = (page - 1) * pageSize;
-        const sql = `select * from schedule LIMIT ? OFFSET ?;`
+        const sql = `select * from schedules LIMIT ? OFFSET ?;`
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [pageSize, offset]) as unknown as Schedule[];
         return results.map(result => new ScheduleDto(result)) as ScheduleDto[];
     }
@@ -69,7 +70,7 @@ export default class ScheduleRepository {
         return new ScheduleDto(results[0] as unknown as Schedule);
     }
 
-    async deleteRoom(scheduleCode: number): Promise<boolean> {
+    async deleteSchedule(scheduleCode: number): Promise<boolean> {
         const sql = `delete from schedules where code = ?;`;
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [scheduleCode]) as unknown as ResultSetHeader;
         return results.affectedRows >= 1;

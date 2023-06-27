@@ -25,4 +25,15 @@ export class CreateScheduleDto {
     @Min(0)
     @Max(6)
     day: number
+
+    @IsNotEmpty()
+    @IsNumber()
+    roomCode: number
+
+    @IsNotEmpty()
+    @IsNumber()
+    sectionCode: number
+
+
+
 }

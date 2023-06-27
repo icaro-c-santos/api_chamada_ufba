@@ -9,10 +9,12 @@
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc --project tsconfig.json",
     "build-data": "ts-node src/scripts/createData.ts",
+    "build-mock": "ts-node src/scripts/mockData.ts",
     "start": "yarn build && node ./dist/server.js",
     "swagger-autogen": "node swagger.js"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.0.2",
     "@types/swagger-ui-express": "^4.1.3",
     "body-parser": "^1.20.2",
     "class-transformer": "^0.5.1",

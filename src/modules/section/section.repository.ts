@@ -5,6 +5,7 @@ import { CreateSectionDto } from "./models/createSection.dto";
 import Section from "./models/section.entity";
 import { Professor } from "../professor/models/professor.entity";
 import { Student } from "../student/models/student.entity";
+import { CreateScheduleDto } from "../schedule/models/createSchedule.dto";
 
 export interface SectionIncludes {
     professors?: boolean,
@@ -15,6 +16,7 @@ export interface SectionIncludes {
 export default class SectionRepository {
 
     protected mysqlClient: MysqlClient;
+    protected scheduleRepository
     constructor() {
         this.mysqlClient = new MysqlClient();
     }
@@ -95,9 +97,10 @@ export default class SectionRepository {
         return false;
     }
 
-    async addScheduleInSection(sectionCode: number, scheduleCode: number): Promise<boolean> {
+    async addScheduleInSection(sectionCode: number, createSectionDto: CreateScheduleDto): Promise<boolean> {
 
-        try {
+        try {   
+
 
         } catch (error) {
 
