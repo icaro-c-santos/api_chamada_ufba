@@ -17,7 +17,6 @@ export interface SectionIncludes {
 export default class SectionRepository {
 
     protected mysqlClient: MysqlClient;
-    protected scheduleRepository
     constructor() {
         this.mysqlClient = new MysqlClient();
     }
@@ -97,8 +96,6 @@ export default class SectionRepository {
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [studentEnrolment, sectionCode]) as unknown as ResultSetHeader;
         return results.affectedRows >= 1;
     }
-
-
 
 
 

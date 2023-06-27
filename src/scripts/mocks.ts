@@ -175,7 +175,7 @@ export const subjectsMock: {
 }
 
 
-export const hoursMock: Omit<Schedule, "code" | "section" | "room">[] = [
+export const hoursMock: Omit<Schedule, "code" | "sectionCode" | "roomCode">[] = [
   { start_time: 420, end_time: 480, day: 1 },   // 07:00 - 08:00
   { start_time: 480, end_time: 540, day: 1 },   // 08:00 - 09:00
   { start_time: 540, end_time: 600, day: 1 },   // 09:00 - 10:00

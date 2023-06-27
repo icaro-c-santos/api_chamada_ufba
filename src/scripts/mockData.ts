@@ -70,12 +70,7 @@ export default class MockBuildData {
     }
 
 
-    private async createScheduleMock(sectionCode: number, createScheduleDto: Omit<CreateScheduleDto, "code">): Promise<number> {
-        const { start_time, end_time, day, room } = createScheduleDto;
-        const sql = `INSERT INTO schedules (start_time,end_time,day,room,section) values (?,?,?,?,?);`;
-        const results = await this.mysqlClient.executeSQLQueryParams(sql, [start_time, end_time, day, room, sectionCode]) as unknown as ResultSetHeader;
-        return results.insertId
-    }
+
     async buildStudent(numberOfStudents: number) {
 
         for (let i = 0; i < numberOfStudents; i++) {
@@ -164,7 +159,7 @@ export default class MockBuildData {
 
         const rooms: Room[] = [];
         const profesors: Professor[] = [];
-        const schedule: Omit<Schedule, "code" | "section" | "room">[] = [];;
+        const schedule: Omit<Schedule, "code" | "sectionCode" | "roomCode">[] = [];;
 
 
         let j = 0;
@@ -191,7 +186,7 @@ export default class MockBuildData {
                     subject: subjects[j].code
                 });
 
-                const schedules: Omit<Schedule, "code" | "section" | "room">[] = [];
+                const schedules: Omit<Schedule, "code" | "sectionCode" | "roomCode">[] = [];
 
 
                 schedules.push(schedule.splice(Math.floor(Math.random() * schedule.length), 1)[0]);
@@ -216,8 +211,9 @@ export default class MockBuildData {
                 for (let schedule of schedules) {
                     try {
                         const r = rooms.splice(Math.floor(Math.random() * rooms.length), 1)[0];
-                        await this.createScheduleMock(code, {
-                            ...schedule, room: r.code
+                        await this.scheduleRepository.createSchedule({
+                            ...schedule, roomCode: r.code,
+                            sectionCode: code
                         })
                     } catch (error: any) {
                         logError(error.message);
@@ -243,14 +239,14 @@ export default class MockBuildData {
 
         for (const schedule of data) {
 
-            const { section, day, code } = schedule;
+            const { sectionCode, day, code } = schedule;
             const datas = getNextDates(new Date("03-01-2023"), day + 1, 15);
 
             for (let data of datas) {
                 await createCall({
                     date: data,
                     schedule: code,
-                    section: section,
+                    section: sectionCode,
                     status: generateRandomStatus()
                 })
             }
@@ -288,14 +284,15 @@ const createCall = async (createPresence: {
 const run = async () => {
 
     const mockBuildData = new MockBuildData();
- /*    await mockBuildData.buildSections(5000);
-    await mockBuildData.buildProfessors(2000);
-    await mockBuildData.buildRooms(1000);
-    await mockBuildData.buildStudent(50000);
-    await mockBuildData.buildSubjects(); */
+
+    await mockBuildData.buildSections(100);
+    await mockBuildData.buildProfessors(200);
+    await mockBuildData.buildRooms(500);
+    await mockBuildData.buildStudent(2000);
+    await mockBuildData.buildSubjects();
 
 
-  /*  */  await mockBuildData.buildCall();
+    /* await mockBuildData.buildCall(); */
 
 
 }

@@ -18,6 +18,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(ErrorMiddleware);
+
+
+
 app.listen(process.env.NODE_LOCAL_PORT, () => {
 
   console.log(
