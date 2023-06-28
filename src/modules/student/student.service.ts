@@ -17,32 +17,32 @@ export default class StudentService {
     }
 
     async getAllStudent({ page = 1, pageSize = 25 }: Pagination = {}): Promise<Student[]> {
-        const students = await this.studentRepository.getAllStudent(); 
-        return students; 
+        const students = await this.studentRepository.getAllStudent();
+        return students;
     }
 
     async getStudentByName(data: { nameStudent: string } & Pagination): Promise<Student[]> {
         const student = await this.studentRepository.getStudentByName(data);
-        return student; 
+        return student;
     }
 
     async getStudentByCpf(cpf: string): Promise<Student | null> {
         const student = await this.studentRepository.getStudentByCpf(cpf);
-        return student; 
+        return student;
     }
 
     async getStudentByEnrolment(studentEnrolment: string): Promise<Student | null> {
-        const student = await this.studentRepository.getStudentByEnrolment(studentEnrolment); 
-        return student; 
+        const student = await this.studentRepository.getStudentByEnrolment(studentEnrolment);
+        return student;
     }
 
     async updateStudent(cpf: string, update: UpdateStudentDto): Promise<boolean> {
-        const student = await this.studentRepository.updateStudent(cpf,update); 
-        return student; 
+        const student = await this.studentRepository.updateStudent(cpf, update);
+        return student;
     }
 
     async deleteStudent(cpf: string): Promise<boolean> {
         const deletedStudent = await this.studentRepository.deleteStudent(cpf);
-        return deletedStudent; 
+        return deletedStudent;
     }
 }
