@@ -4,39 +4,39 @@ import Room from "./models/room.entity";
 import RoomRepository from "./room.repository";
 
 export default class RoomService{
-    private rrepository: RoomRepository; 
+    private roomRepository: RoomRepository; 
 
     constructor(){
-        this.rrepository = new RoomRepository(); 
+        this.roomRepository = new RoomRepository(); 
     }
     async createRoom(create: CreateRoomDto): Promise<Room> {
-       const room = await this.rrepository.createRoom(create);
+       const room = await this.roomRepository.createRoom(create);
        return room;
     }
 
     async getAllRooms({ page = 1, pageSize = 25 }: Pagination = {}): Promise<Room[]> {
-        const rooms = await this.rrepository.getAllRooms();
+        const rooms = await this.roomRepository.getAllRooms();
         return rooms;
     }
 
     async getRoomsByPaf(data: { roomPaf: string } & Pagination): Promise<Room[]> {
-       const rooms = await this.rrepository.getRoomsByPaf(data); 
+       const rooms = await this.roomRepository.getRoomsByPaf(data); 
        return rooms; 
     }
 
     async getRoomsByNumber(data: { roomNumber: string } & Pagination): Promise<Room[]> {
-        const rooms = await this.rrepository.getRoomsByNumber(data); 
+        const rooms = await this.roomRepository.getRoomsByNumber(data); 
         return rooms; 
     }
 
     async getRoomsByCode(code: string): Promise<Room | null> {
-        const rooms = await this.rrepository.getRoomsByCode(code); 
+        const rooms = await this.roomRepository.getRoomsByCode(code); 
         return rooms; 
         
     }
 
     async deleteRoom(code: string): Promise<boolean> {
-        const deletedRoom = await this.rrepository.deleteRoom(code); 
+        const deletedRoom = await this.roomRepository.deleteRoom(code); 
         return deletedRoom; 
     }
 }
