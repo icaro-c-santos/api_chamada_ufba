@@ -10,31 +10,32 @@ export default class ProfessorService {
     constructor() {
         this.prepository = new ProfessorRepository(); 
     }
-    async createProfessor(data: createProfessorDto):Promise<any> {
+    async createProfessor(data: createProfessorDto):Promise<Professor> {
         const teacher = await this.prepository.createProfessor(data);
         return teacher;  
     }
-    async getAllProfessor():Promise<any>{
+    async getAllProfessor({ page = 1, pageSize = 25 }: Pagination = {}):Promise<Professor[]>{
         const teachers = await this.prepository.getAllProfessor(); 
         return teachers; 
     }
-    async getProfessorByName(data: { nameProfessor: string } & Pagination): Promise<any>{
+    async getProfessorByName(data: { nameProfessor: string } & Pagination): Promise<Professor[]>{
         const teacher = await this.prepository.getProfessorByName(data); 
         return teacher; 
     }
-    async getProfessorByCpf(cpf: string): Promise<any> {
+    async getProfessorByCpf(cpf: string): Promise<Professor | null> {
         const teacher = await this.prepository.getProfessorByCpf(cpf);
         return teacher; 
     }
-    async getProfessorByEnrolment (enrolment: string): Promise<any> {
+    async getProfessorByEnrolment (enrolment: string): Promise<Professor | null> {
         const teacher = await this.prepository.getProfessorByEnrolment(enrolment);
         return teacher; 
     }
-    async updateProfessor(cpf: string, update: UpdateProfessorDto): Promise<any>{
+    async updateProfessor(cpf: string, update: UpdateProfessorDto): Promise<boolean>{
         const teacher = await this.prepository.updateProfessor(cpf, update); 
         return teacher; 
     }
-    async deleteProfessor(cpf: string): Promise<any>{
+    async deleteProfessor(cpf: string): Promise<boolean>{
         const deletedTeacher = await this.prepository.deleteProfessor(cpf); 
+        return deletedTeacher; 
     }
 }
