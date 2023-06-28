@@ -4,7 +4,6 @@ WORKDIR /usr/app
 
 COPY package*.json ./
 COPY tsconfig.json ./
-COPY ./prisma ./prisma
 RUN yarn install 
 
 COPY . .
