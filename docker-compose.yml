@@ -19,6 +19,8 @@ services:
     restart: always 
     ports: 
       - ${NODE_LOCAL_PORT}:${NODE_LOCAL_PORT}
+    depends_on:
+      - mysqldb
 volumes:
   db:
 
