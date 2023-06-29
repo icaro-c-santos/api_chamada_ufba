@@ -96,7 +96,4 @@ export default class SectionRepository {
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [studentEnrolment, sectionCode]) as unknown as ResultSetHeader;
         return results.affectedRows >= 1;
     }
-
-
-
 } 

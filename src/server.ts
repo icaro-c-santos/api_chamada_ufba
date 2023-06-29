@@ -10,6 +10,7 @@ import RoomRepository from "./modules/room/room.repository";
 import routerProfessor from "./modules/professor/professor.routes";
 import routerRoom from "./modules/room/room.routes";
 import routerSchedule from "./modules/schedule/schedule.routes";
+import routerSection from "./modules/section/section.routes";
 
 dotenv.config();
 config();
@@ -28,6 +29,7 @@ app.use(ErrorMiddleware);
 app.use("/professor", routerProfessor);
 app.use("/room", routerRoom);
 app.use("/schedule", routerSchedule); 
+app.use("/section", routerSection); 
 
 app.listen(process.env.NODE_LOCAL_PORT, () => {
 
