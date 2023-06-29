@@ -7,6 +7,7 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerDocument } from "./doc/swagger";
 import { ErrorMiddleware } from "./middlewares/errorMiddleware ";
 import RoomRepository from "./modules/room/room.repository";
+import routerProfessor from "./modules/professor/professor.routes";
 
 dotenv.config();
 config();
@@ -15,12 +16,14 @@ const PORT = process.env.NODE_LOCAL_PORT
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(ErrorMiddleware);
 
 
+app.use("/professor", routerProfessor);
 
 app.listen(process.env.NODE_LOCAL_PORT, () => {
 
