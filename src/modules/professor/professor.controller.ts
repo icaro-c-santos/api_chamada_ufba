@@ -102,7 +102,7 @@ export default class ProfessorController {
 
     }
 
-    async deleteProfessor(req: Request, res: Response): Promise<Professor | undefined> {
+    async deleteProfessor(req: Request, res: Response): Promise<boolean | undefined> {
 
         const teacherCPF = req.body.id;
 

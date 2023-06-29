@@ -5,7 +5,7 @@ import ProfessorController from "./professor.controller";
 const routerProfessor = Router();
 const professorController = new ProfessorController;
 
-// Rota para criação de usuário
+
 routerProfessor.post("/", professorController.createProfessor.bind(professorController));
 routerProfessor.get("/:cpf", professorController.getProfessorByCpf.bind(professorController));
 routerProfessor.get("/:code", professorController.getProfessorByCode.bind(professorController));
