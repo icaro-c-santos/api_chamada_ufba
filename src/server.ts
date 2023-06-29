@@ -11,6 +11,8 @@ import routerProfessor from "./modules/professor/professor.routes";
 import routerRoom from "./modules/room/room.routes";
 import routerSchedule from "./modules/schedule/schedule.routes";
 import routerSection from "./modules/section/section.routes";
+import routerStudent from "./modules/student/student.routes";
+import routerSubject from "./modules/subject/subject.routes";
 
 dotenv.config();
 config();
@@ -30,6 +32,8 @@ app.use("/professor", routerProfessor);
 app.use("/room", routerRoom);
 app.use("/schedule", routerSchedule); 
 app.use("/section", routerSection); 
+app.use("student", routerStudent);
+app.use("subject", routerSubject);
 
 app.listen(process.env.NODE_LOCAL_PORT, () => {
 
