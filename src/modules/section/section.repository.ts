@@ -50,9 +50,10 @@ export default class SectionRepository {
 
     async getStudentsInSection(sectionCode: number): Promise<Student[]> {
 
-        const sql = `SELECT * FROM sections inner join students_sections on sections.code = students_sections.sectionCode inner join students on  students_sections.studentEnrolment = students.enrolment inner join person on person.cpf = students.cpf`;
-        const results = await this.mysqlClient.executeSQLQueryParams(sql, [sectionCode]) as unknown as Student[];
-        return results;
+        const sql = `SELECT persons.*,enrolment from students_sections inner join students on students_sections.studentEnrolment = students.enrolment inner join persons
+        on persons.cpf = students.cpf where sectionCode = ?;`;
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [sectionCode])
+        return results as Student[];
     }
 
     async addProfessorInSection(sectionCode: number, professorCode: number): Promise<boolean> {
