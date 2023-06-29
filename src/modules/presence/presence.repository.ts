@@ -16,7 +16,7 @@ export interface FiltersPresence extends Pagination {
     studentEnrolment?: number,
 }
 
-export default class SubjectRepository {
+export default class PresenceRepository {
 
     protected mysqlClient: MysqlClient;
     constructor() {
@@ -64,15 +64,19 @@ export default class SubjectRepository {
 
     async createPresence(createPresenceDto: CreatePresenceDto): Promise<boolean> {
         const { date, scheduleCode, status, studentEnrolment } = createPresenceDto;
-        const sql = `INSERT INTO presences (status,scheduleCode,studentEnrolment,date) values (?,?,?,?);`;
+        const sql = `INSERT INTO presences (date,scheduleCode,status,studentEnrolment) values (?,?,?,?);`;
         try {
+         
             const results = await this.mysqlClient.executeSQLQueryParams(sql, [date, scheduleCode, status, studentEnrolment]) as unknown as ResultSetHeader;
+
             return results.affectedRows >= 1;
         } catch (error: any) {
             if (error?.code && error.code == "ER_DUP_ENTRY") {
                 new BusinessExceptions("presença para esse horario dessa turma e aluno já cadastrada", "duplicateEntity", 400);
             }
+          
             throw error
+
         }
 
     }

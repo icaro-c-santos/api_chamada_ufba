@@ -1,4 +1,4 @@
-import { faker, ru } from "@faker-js/faker"
+import { faker, ru, th } from "@faker-js/faker"
 import MysqlClient from "../data/mysqlClient"
 import ProfessorRepository from "../modules/professor/professor.repository"
 import StudentRepository from "../modules/student/student.repository"
@@ -14,6 +14,8 @@ import { ResultSetHeader } from "mysql2"
 import Room from "../modules/room/models/room.entity"
 import { CreateScheduleDto } from "../modules/schedule/models/createSchedule.dto"
 import ScheduleRepository from "../modules/schedule/schedule.repository"
+import { Student } from "../modules/student/models/student.entity"
+import PresenceRepository from "../modules/presence/presence.repository"
 
 
 const logSucess = (msg: string) => {
@@ -57,6 +59,7 @@ export default class MockBuildData {
     protected subjectRepository: SubjectRepository
     protected sectionRepository: SectionRepository
     protected scheduleRepository: ScheduleRepository
+    protected presenceRepository: PresenceRepository
     protected mysqlClient: MysqlClient
     constructor() {
 
@@ -66,6 +69,7 @@ export default class MockBuildData {
         this.subjectRepository = new SubjectRepository();
         this.sectionRepository = new SectionRepository();
         this.scheduleRepository = new ScheduleRepository();
+        this.presenceRepository = new PresenceRepository();
         this.mysqlClient = new MysqlClient();
     }
 
@@ -233,23 +237,127 @@ export default class MockBuildData {
 
 
     async buildCall() {
-        const data = await this.scheduleRepository.getAllSchedules({
-            page: 1, pageSize: 100000
-        }) as unknown as Schedule[]
 
-        for (const schedule of data) {
+        let schedules: Schedule[] = [];
+        let pageSize = 2;
+        let pageIndex = 1;
+        do {
+            schedules = await this.scheduleRepository.getAllSchedules({
+                page: pageIndex, pageSize: pageSize
+            }) as unknown as Schedule[];
+            pageIndex++;
+            let presenceCreated = 0;
+            for (const schedule of schedules) {
+                const { day, code, sectionCode } = schedule;
+                const students = await this.sectionRepository.getStudentsInSection(sectionCode);
+                if (schedule.day >= 6) {
+                    continue;
+                }
+                for (const student of students) {
 
-            const { sectionCode, day, code } = schedule;
-            const datas = getNextDates(new Date("03-01-2023"), day + 1, 15);
+                    const datas = getNextDates(new Date("03-01-2023"), day + 1, 15);
 
-            for (let data of datas) {
-                await createCall({
-                    date: data,
-                    schedule: code,
-                    section: sectionCode,
-                    status: generateRandomStatus()
-                })
+                    for (let data of datas) {
+                        try {
+
+                            await this.presenceRepository.createPresence({
+                                date: data,
+                                scheduleCode: code,
+                                studentEnrolment: student.enrolment,
+                                status: generateRandomStatus()
+                            })
+                            presenceCreated++;
+                            logSucess("CRIANDO PRESENÇA" + presenceCreated);
+                        } catch (error: any) {
+                             logError("ERRO AO CRIAR PRESENÇA ->" + error?.message);
+                        }
+                    }
+
+                }
+
             }
+
+
+
+        } while (schedules.length > 0)
+
+
+
+
+
+    }
+
+
+    async buildStudentInSection() {
+
+        const data = await this.sectionRepository.getAllSections({ page: 1, pageSize: 10000 });
+        const students = await this.studentRepository.getAllStudent({ page: 1, pageSize: 50000 });
+
+        let studentsSort: Student[] = [];
+
+
+
+        for (let section of data) {
+
+            if (studentsSort.length == 0) {
+                students.forEach(item => studentsSort.push(item));
+            }
+
+            let enrolmentToAdd = studentsSort.pop()?.enrolment;
+            if (enrolmentToAdd) {
+                try {
+                    await this.sectionRepository.addStudentInSection(section.code, enrolmentToAdd);
+                    logSucess("ADICIONANDO ESTUDANTE!");
+                } catch (error) {
+
+                }
+
+            }
+            enrolmentToAdd = studentsSort.pop()?.enrolment;
+            if (enrolmentToAdd) {
+                try {
+                    await this.sectionRepository.addStudentInSection(section.code, enrolmentToAdd);
+                    logSucess("ADICIONANDO ESTUDANTE!");
+                } catch (error) {
+
+                }
+
+            }
+
+            enrolmentToAdd = studentsSort.pop()?.enrolment;
+            if (enrolmentToAdd) {
+                try {
+                    await this.sectionRepository.addStudentInSection(section.code, enrolmentToAdd);
+                    logSucess("ADICIONANDO ESTUDANTE!");
+                } catch (error) {
+
+                }
+
+            }
+
+            enrolmentToAdd = studentsSort.pop()?.enrolment;
+            if (enrolmentToAdd) {
+                try {
+                    await this.sectionRepository.addStudentInSection(section.code, enrolmentToAdd);
+                    logSucess("ADICIONANDO ESTUDANTE!");
+                } catch (error) {
+
+                }
+
+            }
+
+
+            enrolmentToAdd = studentsSort.pop()?.enrolment;
+            if (enrolmentToAdd) {
+                try {
+                    await this.sectionRepository.addStudentInSection(section.code, enrolmentToAdd);
+                    logSucess("ADICIONANDO ESTUDANTE!");
+                } catch (error) {
+
+                }
+
+            }
+
         }
     }
 
@@ -270,29 +378,18 @@ const generateRandomStatus = (): number => {
 
 
 
-const createCall = async (createPresence: {
-    status: number,
-    section: number,
-    schedule: number,
-    date: Date
-}) => {
-
-    console.log(createPresence);
-}
 
 
 const run = async () => {
 
     const mockBuildData = new MockBuildData();
-
-    await mockBuildData.buildSections(100);
-    await mockBuildData.buildProfessors(200);
-    await mockBuildData.buildRooms(500);
-    await mockBuildData.buildStudent(2000);
-    await mockBuildData.buildSubjects();
-
-
-    /* await mockBuildData.buildCall(); */
+    /*  await mockBuildData.buildProfessors(2000);
+     await mockBuildData.buildStudent(30000);
+     await mockBuildData.buildSubjects();
+     await mockBuildData.buildRooms(1000);
+     await mockBuildData.buildSections(5000);
+     await mockBuildData.buildStudentInSection(); */
+    await mockBuildData.buildCall();
 
 
 }

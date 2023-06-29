@@ -80,8 +80,10 @@ export default class SectionRepository {
     async addStudentInSection(sectionCode: number, studentEnrolment: number): Promise<boolean> {
 
         try {
+        
             const sql = `INSERT INTO students_sections (studentEnrolment,sectionCode) values (?,?);`;
             const results = await this.mysqlClient.executeSQLQueryParams(sql, [studentEnrolment, sectionCode]) as unknown as ResultSetHeader;
+         
             return results.affectedRows >= 1;
         } catch (error: any) {
             if (error?.code && error.code == "ER_DUP_ENTRY") {

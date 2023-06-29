@@ -34,12 +34,17 @@ export default class ScheduleRepository {
     }
 
     async getScheduleByFilters(data: FiltersSchedule): Promise<ScheduleDto[]> {
-        const { page = 1, pageSize = 25, day, end_time, start_time } = data;
+        let { page = 1, pageSize = 25, day, end_time, start_time } = data;
         const values: (string | number)[] = [];
         const filters: string[] = [];
 
+
         if (day) {
+            if (day > 6) {
+                day = 6;
+            }
             filters.push('day = ?');
+
             values.push(day);
         }
 

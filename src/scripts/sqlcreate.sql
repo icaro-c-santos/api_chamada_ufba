@@ -62,6 +62,12 @@ CREATE TABLE `presences` (
 	PRIMARY KEY (`scheduleCode`,`studentEnrolment`,`date`)
 );
 
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk0` FOREIGN KEY (`status`) REFERENCES `status`(`id`) ON DELETE CASCADE;
+
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk1` FOREIGN KEY (`scheduleCode`) REFERENCES `schedules`(`code`) ON DELETE CASCADE;
+
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk2` FOREIGN KEY (`studentEnrolment`) REFERENCES `students_sections`(`studentEnrolment`) ON DELETE CASCADE;
+
 CREATE TABLE `status` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`value` varchar(255) NOT NULL,
@@ -73,6 +79,10 @@ CREATE TABLE `professors_sections` (
 	`sectionCode` INT NOT NULL,
 	PRIMARY KEY (`professorCode`,`sectionCode`)
 );
+
+INSERT INTO `banco_api`.`status` (`id`, `value`) VALUES ('1', 'presente');
+INSERT INTO `banco_api`.`status` (`id`, `value`) VALUES ('2', 'ausente');
+INSERT INTO `banco_api`.`status` (`id`, `value`) VALUES ('3', 'abonado');
 
 ALTER TABLE `professors` ADD CONSTRAINT `professors_fk0` FOREIGN KEY (`cpf`) REFERENCES `persons`(`cpf`) ON DELETE CASCADE;
 
@@ -87,12 +97,6 @@ ALTER TABLE `students_sections` ADD CONSTRAINT `students_sections_fk0` FOREIGN K
 ALTER TABLE `students_sections` ADD CONSTRAINT `students_sections_fk1` FOREIGN KEY (`sectionCode`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
 
 ALTER TABLE `sections` ADD CONSTRAINT `sections_fk0` FOREIGN KEY (`subject`) REFERENCES `subjects`(`code`) ON DELETE CASCADE;
-
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk0` FOREIGN KEY (`status`) REFERENCES `status`(`id`) ON DELETE CASCADE;
-
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk1` FOREIGN KEY (`scheduleCode`) REFERENCES `schedules`(`code`) ON DELETE CASCADE;
-
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk2` FOREIGN KEY (`studentEnrolment`) REFERENCES `students_sections`(`studentEnrolment`) ON DELETE CASCADE;
 
 ALTER TABLE `professors_sections` ADD CONSTRAINT `professors_sections_fk0` FOREIGN KEY (`professorCode`) REFERENCES `professors`(`code`) ON DELETE CASCADE;
 
