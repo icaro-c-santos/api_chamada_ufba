@@ -7,7 +7,6 @@ import { Request, Response } from "express";
 import { UpdateProfessorDto } from "./models/updateProfessor.dto";
 
 
-
 export default class ProfessorController {
     private professorService: ProfessorService;
 
@@ -102,9 +101,9 @@ export default class ProfessorController {
 
     }
 
-    async deleteProfessor(req: Request, res: Response): Promise<Professor | undefined> {
+    async deleteProfessor(req: Request, res: Response): Promise<boolean | undefined> {
 
-        const teacherCPF = req.body.id;
+        const teacherCPF = req.body.cpf;
 
         const deletedTeacher = await this.professorService.deleteProfessor(teacherCPF);
 
