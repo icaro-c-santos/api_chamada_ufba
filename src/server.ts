@@ -28,10 +28,10 @@ app.use(cors());
 app.use(ErrorMiddleware);
 
 
-app.use("/professor", routerProfessor);
+app.use("/professors", routerProfessor);
 app.use("/room", routerRoom);
-app.use("/schedule", routerSchedule); 
-app.use("/section", routerSection); 
+app.use("/schedule", routerSchedule);
+app.use("/sections", routerSection);
 app.use("student", routerStudent);
 app.use("subject", routerSubject);
 

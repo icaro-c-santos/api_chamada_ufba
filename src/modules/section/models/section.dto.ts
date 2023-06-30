@@ -4,9 +4,8 @@ import { ScheduleDto } from "../../schedule/models/schedule.dto";
 import { Student } from "../../student/models/student.entity";
 import Subject from "../../subject/models/subject.entity";
 
-export class SectionDto {
+export class SectionDto extends Subject {
     code: number
-    subject: Subject
 }
 
 export type SectionWithTeacherDto = SectionDto & {

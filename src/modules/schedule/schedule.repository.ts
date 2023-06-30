@@ -9,6 +9,7 @@ export interface FiltersSchedule extends Pagination {
     start_time?: number
     end_time?: number
     day?: number
+    sectionCode?: number
 
 }
 export default class ScheduleRepository {
@@ -34,7 +35,7 @@ export default class ScheduleRepository {
     }
 
     async getScheduleByFilters(data: FiltersSchedule): Promise<ScheduleDto[]> {
-        let { page = 1, pageSize = 25, day, end_time, start_time } = data;
+        let { page = 1, pageSize = 25, day, end_time, start_time, sectionCode } = data;
         const values: (string | number)[] = [];
         const filters: string[] = [];
 
@@ -58,11 +59,17 @@ export default class ScheduleRepository {
             values.push(start_time);
         }
 
+
+        if (sectionCode) {
+            filters.push('sectionCode = ?');
+            values.push(sectionCode);
+        }
+
         const offset = (page - 1) * pageSize;
         values.push(pageSize, offset);
 
-        const sql = `select * from schedule where ${filters.join(', ')} LIMIT ? OFFSET ?;`
-        const results = await this.mysqlClient.executeSQLQueryParams(sql, [values]) as unknown as Schedule[];
+        const sql = `select * from schedules where ${filters.join(' AND ')} LIMIT ? OFFSET ?;`
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, values) as unknown as Schedule[];
         return results.map(result => new ScheduleDto(result)) as ScheduleDto[];
     }
 

@@ -11,4 +11,5 @@ export default class PresenceDto {
     phone: number;
     date: string;
     sectionCode: number;
+    load_presence: number
 }

@@ -38,30 +38,36 @@ export default class SectionController {
     }
 
     async getProfessorsInSection(req: Request, res: Response): Promise<Professor[] | undefined> {
-        const sectionCode = req.body.code;
+        const sectionCode = parseInt(req.params.code);
 
-        const teacher = await this.sectionService.getProfessorsInSection(sectionCode);
+        const teachers = await this.sectionService.getProfessorsInSection(sectionCode);
 
-        if (!teacher) {
+
+        if (!teachers) {
             res.status(404).json({ error: "Professor não encontrado na sessão" });
             return;
         }
 
-        res.status(200).json({ teacher });
+        res.status(200).json(teachers);
 
     }
 
-    async getStudentsInSection(req: Request, res: Response): Promise<Student[] | undefined> {
-        const sectionCode = req.body.code;
+    async getDataSection(req: Request, res: Response) {
+        const code = parseInt(req.params.code);
+        const data = await this.sectionService.getDataSection(code);
+        if (!data) {
+            res.status(404).json({ error: "NÃO FOI POSSÍVEL OBTER OS DADOS DA TURMA!" });
+            return;
+        }
+        res.status(200).json( data );
+    }
+
+    async getStudentsInSection(req: Request, res: Response) {
+        const sectionCode = parseInt(req.params.code);
 
         const student = await this.sectionService.getStudentsInSection(sectionCode);
 
-        if (!student) {
-            res.status(404).json({ error: "Estudante não encontrado na sessão" });
-            return;
-        }
-
-        res.status(200).json({ student });
+        res.status(200).json(student);
 
     }
 

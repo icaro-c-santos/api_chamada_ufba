@@ -14,6 +14,7 @@ export interface FiltersPresence extends Pagination {
     status?: number,
     scheduleCode?: number,
     studentEnrolment?: number,
+    sectionCode?: number
 }
 
 export default class PresenceRepository {
@@ -25,7 +26,7 @@ export default class PresenceRepository {
 
 
     async getPresenceByFilter(data: FiltersPresence) {
-        const { page = 1, pageSize = 25, date, scheduleCode, status, studentEnrolment } = data;
+        const { page = 1, pageSize = 25, date, scheduleCode, status, studentEnrolment, sectionCode } = data;
         const values: (number | Date)[] = [];
         const filters: string[] = [];
 
@@ -50,13 +51,18 @@ export default class PresenceRepository {
             values.push(studentEnrolment);
         }
 
+        if (sectionCode) {
+            filters.push('schedules.sectionCode = ?');
+            values.push(sectionCode);
+        }
+
         const offset = (page - 1) * pageSize;
         values.push(pageSize, offset);
 
-        const sql = `Select status.value as statusValue  , status.id as statusId,students.enrolment,persons.*,date,sectionCode  from presences inner join students on presences.studentEnrolment = students.enrolment inner join persons on 
+        const sql = `Select status.value as statusValue  , status.id as statusId,students.enrolment,persons.*,date,sectionCode , (schedules.end_time - schedules.start_time) AS load_presence  from presences inner join students on presences.studentEnrolment = students.enrolment inner join persons on 
         persons.cpf = students.cpf inner join status on status.id = presences.status inner join schedules on
-         presences.scheduleCode = schedules.code inner join sections on schedules.sectionCode = sections.code ${filters.join(', ')} LIMIT ? OFFSET ?;`
-        const results = await this.mysqlClient.executeSQLQueryParams(sql, [values]) as unknown;
+         presences.scheduleCode = schedules.code inner join sections on schedules.sectionCode = sections.code ${filters.length > 0 && "where "} ${filters.join(' AND ')} LIMIT ? OFFSET ?;`
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, values) as unknown;
         return results as PresenceDto[];
     }
 
@@ -66,7 +72,7 @@ export default class PresenceRepository {
         const { date, scheduleCode, status, studentEnrolment } = createPresenceDto;
         const sql = `INSERT INTO presences (date,scheduleCode,status,studentEnrolment) values (?,?,?,?);`;
         try {
-         
+
             const results = await this.mysqlClient.executeSQLQueryParams(sql, [date, scheduleCode, status, studentEnrolment]) as unknown as ResultSetHeader;
 
             return results.affectedRows >= 1;
@@ -74,12 +80,13 @@ export default class PresenceRepository {
             if (error?.code && error.code == "ER_DUP_ENTRY") {
                 new BusinessExceptions("presença para esse horario dessa turma e aluno já cadastrada", "duplicateEntity", 400);
             }
-          
+
             throw error
 
         }
 
     }
+
 
     async deletePresence(deletePresenceDto: DeletePresenceDto) {
         const { date, scheduleCode, studentEnrolment } = deletePresenceDto;
