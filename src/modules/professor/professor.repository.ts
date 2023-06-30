@@ -94,7 +94,7 @@ export default class ProfessorRepository {
         return results[0] as Professor || null;
     }
 
-    async getProfessorByEnrolment(ProfessorEnrolment: string): Promise<Professor | null> {
+    async getProfessorByCode(ProfessorEnrolment: string): Promise<Professor | null> {
         const sql = `select * from professors inner join persons on professors.cpf = persons.cpf where professors.enrolments = ?;`
         const [error, results, fields] = await this.mysqlClient.executeSQLQueryParams(sql, [ProfessorEnrolment]);
         return results[0] as Professor || null;

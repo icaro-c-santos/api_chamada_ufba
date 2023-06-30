@@ -26,8 +26,8 @@ export default class ProfessorService {
         const teacher = await this.professorRepository.getProfessorByCpf(cpf);
         return teacher; 
     }
-    async getProfessorByEnrolment (enrolment: string): Promise<Professor | null> {
-        const teacher = await this.professorRepository.getProfessorByEnrolment(enrolment);
+    async getProfessorByCode (code: string): Promise<Professor | null> {
+        const teacher = await this.professorRepository.getProfessorByCode(code);
         return teacher; 
     }
     async updateProfessor(cpf: string, update: UpdateProfessorDto): Promise<boolean>{
