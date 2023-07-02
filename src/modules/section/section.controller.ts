@@ -32,9 +32,24 @@ export default class SectionController {
         res.status(200).json({ section: createSection });
     }
 
+    async deleteSection(req: Request, res: Response) {
+        const { code } = req.params;
+        const result = await this.sectionService.deleteSection(parseInt(code));
+        if (result) {
+            return res.status(200).send();
+        } else {
+            return res.status(404).send();
+        }
+    }
+
     async getAllSections(req: Request, res: Response): Promise<void> {
-        const sections = await this.sectionService.getAllSections();
-        res.status(200).json({ sections });
+
+        const { page, pageSize } = req.params;
+        const sections = await this.sectionService.getAllSections({
+            page: parseInt(page),
+            pageSize: parseInt(pageSize)
+        });
+        res.status(200).json(sections);
     }
 
     async getProfessorsInSection(req: Request, res: Response): Promise<Professor[] | undefined> {
@@ -59,7 +74,7 @@ export default class SectionController {
             res.status(404).json({ error: "NÃO FOI POSSÍVEL OBTER OS DADOS DA TURMA!" });
             return;
         }
-        res.status(200).json( data );
+        res.status(200).json(data);
     }
 
     async getStudentsInSection(req: Request, res: Response) {

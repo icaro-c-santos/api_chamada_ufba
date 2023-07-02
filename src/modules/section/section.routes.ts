@@ -5,7 +5,8 @@ import SectionController from "./section.controller";
 const routerSection = Router();
 const sectionController = new SectionController;
 
-
+routerSection.get("/", sectionController.getAllSections.bind(sectionController));
+routerSection.delete("/:code", sectionController.deleteSection.bind(sectionController));
 
 routerSection.get("/:code", sectionController.getDataSection.bind(sectionController))
 routerSection.get("/:code/professors", sectionController.getProfessorsInSection.bind(sectionController));

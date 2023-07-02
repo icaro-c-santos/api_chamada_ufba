@@ -1,3 +1,4 @@
+import { BusinessExceptions } from "../../exceptions/BusinessExceptions";
 import { Pagination } from "../../types/Pagination";
 import PresenceRepository from "../presence/presence.repository";
 import { Professor } from "../professor/models/professor.entity";
@@ -22,8 +23,12 @@ export default class SectionService {
 
 
     async getDataSection(sectionCode: number) {
+
         const students = await this.sectionRepository.getStudentsInSection(sectionCode);
         const section = await this.sectionRepository.getSectionByCode(sectionCode);
+        if(!section){
+            throw new BusinessExceptions("TURMA NÃO EXISTE!","notFoundResource",404);
+        }
         const professors = await this.sectionRepository.getProfessorsInSection(sectionCode);
         const schedules = await this.scheduleRepository.getScheduleByFilters({
             page: 1, pageSize: 10, sectionCode: sectionCode
@@ -143,6 +148,11 @@ export default class SectionService {
 
     async addStudentInSection(sectionCode: number, studentEnrolment: number): Promise<boolean> {
         const student = await this.sectionRepository.addStudentInSection(sectionCode, studentEnrolment);
+        return student;
+    }
+
+    async deleteSection(sectionCode: number): Promise<boolean> {
+        const student = await this.sectionRepository.deleteSection(sectionCode);
         return student;
     }
 

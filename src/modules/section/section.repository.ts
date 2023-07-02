@@ -38,23 +38,46 @@ export default class SectionRepository {
     async getSectionByCode(sectionCode: number): Promise<SectionDto> {
         const sql = `select * from sections inner join subjects on subjects.code = sections.code where sections.code = ?;`
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [sectionCode]) as unknown as SectionDto[];
+        console.log(results);
         return results[0];
     }
 
+
+
+
     async getAllSections({ page = 1, pageSize = 25 }: Pagination = {}): Promise<Section[]> {
         const offset = (page - 1) * pageSize;
-        const sql = `select * from sections LIMIT ? OFFSET ?;`
+
+
+
+        const sql = `select * from sections inner join subjects on subjects.code = sections.code LIMIT ? OFFSET ?;`
+
+
+
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [pageSize, offset]) as unknown as Section[];
         return results;
     }
 
+    async getSectionOfTeacher({ page = 1, pageSize = 25, teacherCode }: Pagination & { teacherCode: number }) {
+        const offset = (page - 1) * pageSize;
+        const sql = `SELECT  su.code AS code, su.name AS name,su.subject_load as subject_load,su.code as subject 
+        FROM professors p
+        INNER JOIN professors_sections ps ON p.code = ps.professorCode
+        INNER JOIN sections s ON ps.sectionCode = s.code
+        INNER JOIN subjects su ON s.subject = su.code where ps.professorCode = ? LIMIT ? OFFSET ?;`;
+
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [teacherCode, pageSize, offset]);
+        return results;
+
+    }
+
+
     async getProfessorsInSection(sectionCode: number): Promise<Professor[]> {
 
-        console.log(sectionCode);
         const sql = `SELECT * FROM sections inner join professors_sections on sections.code = professors_sections.sectionCode inner join professors on professors.code = professors_sections.professorCode inner join persons on professors.cpf = persons.cpf where sections.code = ?`;
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [sectionCode]) as unknown as Professor[];
 
-      
+
         return results;
     }
 
@@ -107,6 +130,12 @@ export default class SectionRepository {
     async removeStudentInSection(sectionCode: number, studentEnrolment: number): Promise<boolean> {
         const sql = `delete from students_sections where studentEnrolment = ? AND sectionCode = ?;`;
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [studentEnrolment, sectionCode]) as unknown as ResultSetHeader;
+        return results.affectedRows >= 1;
+    }
+
+    async deleteSection(sectionCode: number): Promise<boolean> {
+        const sql = `delete from sections where sections.code = ?;`;
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [sectionCode]) as unknown as ResultSetHeader;
         return results.affectedRows >= 1;
     }
 } 
