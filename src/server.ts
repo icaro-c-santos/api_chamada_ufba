@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use("/client/professors", routerClient);
+app.use("/client", routerClient);
 app.use("/professors", routerProfessor);
 app.use("/room", routerRoom);
 app.use("/schedule", routerSchedule);

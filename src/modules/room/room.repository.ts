@@ -57,7 +57,7 @@ export default class RoomRepository {
         return results as Room[];
     }
 
-    async getRoomsByCode(roomCode: string): Promise<Room | null> {
+    async getRoomsByCode(roomCode: number): Promise<Room | null> {
         const sql = `select * from rooms where code = ?;`
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [roomCode]);
         return results[0] as Room || null;

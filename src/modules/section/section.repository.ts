@@ -36,9 +36,8 @@ export default class SectionRepository {
     }
 
     async getSectionByCode(sectionCode: number): Promise<SectionDto> {
-        const sql = `select * from sections inner join subjects on subjects.code = sections.code where sections.code = ?;`
+        const sql = `select * from sections inner join subjects on subjects.code = sections.subject where sections.code = ?;`
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [sectionCode]) as unknown as SectionDto[];
-        console.log(results);
         return results[0];
     }
 
@@ -58,9 +57,9 @@ export default class SectionRepository {
         return results;
     }
 
-    async getSectionOfTeacher({ page = 1, pageSize = 25, teacherCode }: Pagination & { teacherCode: number }) {
+    async getSectionsOfTeacher({ page = 1, pageSize = 25, teacherCode }: Pagination & { teacherCode: number }) {
         const offset = (page - 1) * pageSize;
-        const sql = `SELECT  su.code AS code, su.name AS name,su.subject_load as subject_load,su.code as subject 
+        const sql = `SELECT  s.code AS code, su.name AS name,su.subject_load as subject_load,su.code as subject 
         FROM professors p
         INNER JOIN professors_sections ps ON p.code = ps.professorCode
         INNER JOIN sections s ON ps.sectionCode = s.code
@@ -71,6 +70,19 @@ export default class SectionRepository {
 
     }
 
+
+    async getSectionsOfStudent({ page = 1, pageSize = 25, enrolment }: Pagination & { enrolment: number }) {
+        const offset = (page - 1) * pageSize;
+        const sql = `SELECT s.code AS code, sub.code AS subject, sub.name AS name, sub.subject_load AS subject_load
+        FROM students_sections ss
+        INNER JOIN sections s ON ss.sectionCode = s.code
+        INNER JOIN subjects sub ON s.subject = sub.code
+        WHERE ss.studentEnrolment  = ? LIMIT ? OFFSET ?;`;
+
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [enrolment, pageSize, offset]);
+        return results;
+
+    }
 
     async getProfessorsInSection(sectionCode: number): Promise<Professor[]> {
 

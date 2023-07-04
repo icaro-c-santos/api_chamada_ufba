@@ -19,10 +19,8 @@ export default class CreatePresenceDto {
     studentEnrolment: number
 
     @IsNotEmpty()
-    @IsString()
     @Transform(({ value }) => new Date(value))
     @IsDate()
     date: Date
-
 
 }

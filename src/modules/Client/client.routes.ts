@@ -8,9 +8,17 @@ import ClientController from "./client.controller";
 const routerClient = Router();
 const clientController = new ClientController();
 
-routerClient.get("/sections/", clientController.getDataSectionSelfUser.bind(clientController))
-routerClient.get("/sections/:id", clientController.getDataSection.bind(clientController));
-routerClient.get("/sections/:id/presences", clientController.getPresencesOfSection.bind(clientController));
+
+routerClient.post("/login", clientController.login.bind(clientController));
+routerClient.get("/professors/sections", clientController.getDataSectionProfessor.bind(clientController))
+routerClient.get("/professors/sections/:id", clientController.getDataSection.bind(clientController));
+routerClient.get("/professors/sections/:id/presences", clientController.getPresencesOfSection.bind(clientController));
+
+routerClient.get("/students/sections", clientController.getDataSectionStudents.bind(clientController))
+routerClient.get("/students/sections/:id", clientController.getDataSectionOfStudent.bind(clientController))
+routerClient.get("/students/sections/:id/presences", clientController.getPresencesOfStudent.bind(clientController));
+routerClient.put("/students/sections/:id/presences", clientController.updatePresence.bind(clientController));
+routerClient.post("/students/sections/:id/presences", clientController.createPresence.bind(clientController));
 
 export default routerClient;
 

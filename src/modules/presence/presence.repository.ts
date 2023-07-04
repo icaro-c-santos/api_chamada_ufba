@@ -7,6 +7,7 @@ import UpdatePresenceDto from "./models/updatePresence.dto";
 import { Pagination } from "../../types/Pagination";
 import Presence from "./models/presence.entity";
 import PresenceDto from "./models/presence.dto";
+import { formatarData } from "../Client/utils";
 
 
 export interface FiltersPresence extends Pagination {
@@ -15,6 +16,7 @@ export interface FiltersPresence extends Pagination {
     scheduleCode?: number,
     studentEnrolment?: number,
     sectionCode?: number
+    name?: string
 }
 
 export default class PresenceRepository {
@@ -26,16 +28,27 @@ export default class PresenceRepository {
 
 
     async getPresenceByFilter(data: FiltersPresence) {
-        const { page = 1, pageSize = 25, date, scheduleCode, status, studentEnrolment, sectionCode } = data;
-        const values: (number | Date)[] = [];
+        const { page = 1, pageSize = 25, date, scheduleCode, status, studentEnrolment, sectionCode, name } = data;
+        const values: (number | Date | string)[] = [];
         const filters: string[] = [];
 
 
+
         if (date) {
-            filters.push('presences.date = ?');
-            values.push(date);
+            date.setDate(date.getDate() + 1)
+            const newDATE = formatarData(date.toString());
+            if (newDATE) {
+                filters.push('presences.date = ?');
+                values.push(newDATE);
+            }
+
+
         }
 
+        if (name! + null && name?.length != null && name.length > 0) {
+            filters.push("persons.name like ?")
+            values.push(`%${name}%`);
+        }
         if (scheduleCode) {
             filters.push('presences.scheduleCode = ?');
             values.push(scheduleCode);
@@ -59,9 +72,17 @@ export default class PresenceRepository {
         const offset = (page - 1) * pageSize;
         values.push(pageSize, offset);
 
-        const sql = `Select status.value as statusValue  , status.id as statusId,students.enrolment,persons.*,date,sectionCode , (schedules.end_time - schedules.start_time) AS load_presence  from presences inner join students on presences.studentEnrolment = students.enrolment inner join persons on 
-        persons.cpf = students.cpf inner join status on status.id = presences.status inner join schedules on
-         presences.scheduleCode = schedules.code inner join sections on schedules.sectionCode = sections.code ${filters.length > 0 && "where "} ${filters.join(' AND ')} LIMIT ? OFFSET ?;`
+
+        const sql = `SELECT status.value AS status, subjects.name as subjectName,schedules.code as code, subjects.subject_load as subjectLoad, status.id AS statusId, students.enrolment, persons.*, date, sectionCode, (schedules.end_time - schedules.start_time) AS load_presence  
+        FROM presences
+        INNER JOIN students ON presences.studentEnrolment = students.enrolment
+        INNER JOIN persons ON persons.cpf = students.cpf
+        INNER JOIN status ON status.id = presences.status
+        INNER JOIN schedules ON presences.scheduleCode = schedules.code
+        INNER JOIN sections ON schedules.sectionCode = sections.code
+        INNER JOIN subjects ON subjects.code = sections.subject 
+        ${filters.length > 0 ? "WHERE " + filters.join(" AND ") : ""}
+        ORDER BY date DESC LIMIT ? OFFSET ? ;`
         const results = await this.mysqlClient.executeSQLQueryParams(sql, values) as unknown;
         return results as PresenceDto[];
     }
@@ -70,21 +91,12 @@ export default class PresenceRepository {
 
     async createPresence(createPresenceDto: CreatePresenceDto): Promise<boolean> {
         const { date, scheduleCode, status, studentEnrolment } = createPresenceDto;
-        const sql = `INSERT INTO presences (date,scheduleCode,status,studentEnrolment) values (?,?,?,?);`;
-        try {
-
-            const results = await this.mysqlClient.executeSQLQueryParams(sql, [date, scheduleCode, status, studentEnrolment]) as unknown as ResultSetHeader;
-
-            return results.affectedRows >= 1;
-        } catch (error: any) {
-            if (error?.code && error.code == "ER_DUP_ENTRY") {
-                new BusinessExceptions("presença para esse horario dessa turma e aluno já cadastrada", "duplicateEntity", 400);
-            }
-
-            throw error
-
-        }
-
+        const sql = `INSERT INTO presences (date, scheduleCode, status, studentEnrolment)
+        VALUES (?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE status = VALUES(status);`;
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [date, scheduleCode, status, studentEnrolment]) as unknown as ResultSetHeader;
+   
+        return results.affectedRows >= 1;
     }
 
 

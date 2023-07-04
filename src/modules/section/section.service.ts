@@ -26,8 +26,8 @@ export default class SectionService {
 
         const students = await this.sectionRepository.getStudentsInSection(sectionCode);
         const section = await this.sectionRepository.getSectionByCode(sectionCode);
-        if(!section){
-            throw new BusinessExceptions("TURMA NÃO EXISTE!","notFoundResource",404);
+        if (!section) {
+            throw new BusinessExceptions("TURMA NÃO EXISTE!", "notFoundResource", 404);
         }
         const professors = await this.sectionRepository.getProfessorsInSection(sectionCode);
         const schedules = await this.scheduleRepository.getScheduleByFilters({
@@ -56,7 +56,7 @@ export default class SectionService {
             } else {
                 statusStudent = "safe"
             }
-            console.log(schedules);
+
 
             studentsDto.push({
                 ...student, status: statusStudent, absences: absences.length,
@@ -64,6 +64,16 @@ export default class SectionService {
 
 
         }
+
+        const data = {
+            section: section.code,
+            subjectName: section.name,
+            subjectLoad: section.subject_load,
+            professors: professors,
+            students: studentsDto,
+            schedules: schedules
+        }
+  
 
 
         return {
