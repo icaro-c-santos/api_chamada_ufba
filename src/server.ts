@@ -27,13 +27,12 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(ErrorMiddleware);
 
-
-app.use("/professors", routerProfessor);
+app.use("/professor", routerProfessor);
 app.use("/room", routerRoom);
-app.use("/schedule", routerSchedule);
-app.use("/sections", routerSection);
-app.use("student", routerStudent);
-app.use("subject", routerSubject);
+app.use("/schedule", routerSchedule); 
+app.use("/section", routerSection); 
+app.use("/student", routerStudent);
+app.use("/subject", routerSubject);
 
 app.listen(process.env.NODE_LOCAL_PORT, () => {
 
