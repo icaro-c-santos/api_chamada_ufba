@@ -5,6 +5,7 @@ import { BusinessExceptions } from '../exceptions/BusinessExceptions';
 
 export function ErrorMiddleware(error: any, req: Request, res: Response, next: NextFunction) {
 
+    
     if (error instanceof BusinessExceptions) {
 
         return res.status(error.status).json({

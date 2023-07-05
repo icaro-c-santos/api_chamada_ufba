@@ -102,3 +102,15 @@ ALTER TABLE `professors_sections` ADD CONSTRAINT `professors_sections_fk0` FOREI
 
 ALTER TABLE `professors_sections` ADD CONSTRAINT `professors_sections_fk1` FOREIGN KEY (`sectionCode`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
 
+
+
+CREATE TABLE `user` (
+    `login` varchar(255) NOT NULL,
+    `senha` varchar(255) NOT NULL,
+    `token` varchar(255) NOT NULL,
+    `enrolment` INT NULL,
+    `codeProfessor` INT NULL,
+    PRIMARY KEY (`login`),
+    CONSTRAINT `user_fk0` FOREIGN KEY (`enrolment`) REFERENCES `students`(`enrolment`) ON DELETE CASCADE,
+    CONSTRAINT `user_fk1` FOREIGN KEY (`codeProfessor`) REFERENCES `professors`(`code`) ON DELETE CASCADE
+);

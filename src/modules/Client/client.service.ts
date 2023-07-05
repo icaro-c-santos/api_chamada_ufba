@@ -1,8 +1,9 @@
+import MysqlClient from "../../data/mysqlClient";
 import { BusinessExceptions } from "../../exceptions/BusinessExceptions";
 import { Pagination } from "../../types/Pagination";
 import CreatePresenceDto from "../presence/models/createPresence.dto";
 import PresenceRepository from "../presence/presence.repository";
-import { Professor } from "../professor/models/professor.entity";
+import { Person, Professor } from "../professor/models/professor.entity";
 import ProfessorRepository from "../professor/professor.repository";
 import Room from "../room/models/room.entity";
 import RoomRepository from "../room/room.repository";
@@ -11,6 +12,7 @@ import { CreateSectionDto } from "../section/models/createSection.dto";
 import Section from "../section/models/section.entity";
 import SectionRepository from "../section/section.repository";
 import { Student } from "../student/models/student.entity";
+import StudentRepository from "../student/student.repository";
 import { Filters } from "./client.controller";
 
 
@@ -19,16 +21,33 @@ export type SectionTeacher = {
     sectionCode: number
 }
 
+
+export type User = {
+    login: string,
+    senha: string,
+    token: string,
+    enrolment: number,
+    name: string,
+    codeProfessor: number
+}
+
 export default class ClientService {
     private sectionRepository: SectionRepository
     private presenceRepository: PresenceRepository
     private scheduleRepository: ScheduleRepository
     private roomRepository: RoomRepository
+    protected mysqlClient: MysqlClient;
+    private studentRepository: StudentRepository
+    private professorRepository: ProfessorRepository
+
     constructor() {
         this.sectionRepository = new SectionRepository();
         this.presenceRepository = new PresenceRepository();
         this.scheduleRepository = new ScheduleRepository();
         this.roomRepository = new RoomRepository();
+        this.mysqlClient = new MysqlClient();
+        this.professorRepository = new ProfessorRepository();
+        this.studentRepository = new StudentRepository();
     }
 
 
@@ -54,7 +73,7 @@ export default class ClientService {
     }
 
     async getAllPresencesOfSection(filters: Filters) {
-      
+
         return await this.presenceRepository.getPresenceByFilter(filters)
 
     }
@@ -95,6 +114,51 @@ export default class ClientService {
         };
     }
 
+
+    async getUser(login: string, password: string) {
+
+
+        if (login == null || password == null) {
+            return null;
+        }
+        const sql = `select * from user where login = ? AND senha = ?`;
+
+
+        const result = await this.mysqlClient.executeSQLQueryParams(sql, [login, password]) as unknown as User[];
+      
+        if (result == null || result.length == 0) {
+            return null;
+        }
+
+        const user = result[0];
+
+        if (user.enrolment) {
+
+            const person = await this.studentRepository.getStudentByEnrolment(user.enrolment.toString()) as unknown as Person
+            console.log(person);
+            return {
+                ...user,
+                //@ts-ignore
+                name: person.name,
+                enrolment: user.enrolment
+
+            }
+        }
+
+        if (user.codeProfessor) {
+            const person = await this.professorRepository.getProfessorByCode(user.codeProfessor.toString()) as unknown as Person;
+            console.log(person);
+            return {
+                ...user,
+                codeProfessor: user.codeProfessor,
+                name: person.name
+            }
+        }
+
+
+        return null;
+
+    }
 
 
 

@@ -31,7 +31,28 @@ export default class ClientController {
 
     async getDataSectionProfessor(req: Request, res: Response) {
 
-        const professorCode = 1;
+
+        let professorCode;
+        //@ts-ignore
+        console.log("USER ->", req.user);
+        //@ts-ignore
+        if (req.user != null && req.user.codeProfessor != null) {
+            //@ts-ignore
+            professorCode = req.user.codeProfessor;
+        }
+        //@ts-ignore
+
+
+        if (!professorCode) {
+            return res.status(401).send();
+        }
+
+
+
+
+
+
+
         try {
             const data = await this.clientService.getAllSectionsTeacher({
                 page: 1,
@@ -50,9 +71,24 @@ export default class ClientController {
 
     async getPresencesOfStudent(req: Request, res: Response) {
         const { id } = req.params;
-        const { enrolment } = {
-            enrolment: 10286
-        } //todo fazer
+
+        let enrolment;
+
+
+        //@ts-ignore
+        if (req.user != null && req.user.enrolment != null) {
+            //@ts-ignore
+            enrolment = req.user.enrolment;
+        }
+        //@ts-ignore
+        console.log(req.user);
+
+        if (!enrolment) {
+            return res.status(401).send();
+        }
+
+
+
         const data = await this.clientService.getAllPresencesOfStudent({
             enrolment: enrolment,
             sectionCode: parseInt(id)
@@ -64,10 +100,21 @@ export default class ClientController {
 
     async getDataSectionStudents(req: Request, res: Response) {
 
-        const enrolment = 10286; /// todo pegar user
-
 
         try {
+            let enrolment;
+
+
+            //@ts-ignore
+            if (req.user != null && req.user.enrolment != null) {
+                //@ts-ignore
+                enrolment = req.user.enrolment;
+            }
+            //@ts-ignore
+
+            if (!enrolment) {
+                return res.status(401).send();
+            }
             const data = await this.clientService.getAllSectionsStudent({
                 page: 1,
                 enrolment: enrolment,
@@ -85,66 +132,73 @@ export default class ClientController {
 
 
     async getDataSection(req: Request, res: Response) {
-        const id = parseInt(req.params.id);
-        if (!id) {
-            return res.status(404).json({
-                error: {
-                    message: "CÓDIGO DA TURMA INVALIDO!"
-                }
-            })
+        try {
+            const id = parseInt(req.params.id);
+            if (!id) {
+                return res.status(404).json({
+                    error: {
+                        message: "CÓDIGO DA TURMA INVALIDO!"
+                    }
+                })
+            }
+            const data = await this.sectionService.getDataSection(id);
+            if (!data) {
+                res.status(404).json({ error: "NÃO FOI POSSÍVEL OBTER OS DADOS DA TURMA!" });
+                return;
+            }
+            res.status(200).json(data);
+        } catch (error) {
+            res.status(500).json(error);
         }
-        const data = await this.sectionService.getDataSection(id);
-        if (!data) {
-            res.status(404).json({ error: "NÃO FOI POSSÍVEL OBTER OS DADOS DA TURMA!" });
-            return;
-        }
-        res.status(200).json(data);
     }
 
     async getPresencesOfSection(req: Request, res: Response) {
-        const { page, pageSize, sectionCode = null, date = null, studentEnrolment = null, name = null } = req.query;
-
-        const { id } = req.params;
-        let filters: Filters = {}
-        if (page && !isNaN(parseInt(page.toString()))) {
-            filters.page = parseInt(page.toString());
-        }
-
-        if (pageSize && !isNaN(parseInt(pageSize.toString()))) {
-            filters.pageSize = parseInt(pageSize.toString());
-        }
-
-        if (id && !isNaN(parseInt(id))) {
-            filters.sectionCode = parseInt(id);
-        }
-
-
-        if (date != null) {
-            let newDate = formatarData(date.toString() || "");
-            if (newDate) {
-                filters.date = new Date(date.toString());
-            }
-
-        }
-
-        if (studentEnrolment != null) {
-            let enrolment = parseInt(studentEnrolment.toString());
-            if (!isNaN(enrolment) && enrolment > 0) {
-                filters.studentEnrolment = parseInt(studentEnrolment.toString());
-            }
-
-        }
-
-
-        if (name) {
-            //@ts-ignore
-            filters.name = name;
-        }
-
         try {
+
+
+            const { page, pageSize, sectionCode = null, date = null, studentEnrolment = null, name = null } = req.query;
+
+            const { id } = req.params;
+            let filters: Filters = {}
+            if (page && !isNaN(parseInt(page.toString()))) {
+                filters.page = parseInt(page.toString());
+            }
+
+            if (pageSize && !isNaN(parseInt(pageSize.toString()))) {
+                filters.pageSize = parseInt(pageSize.toString());
+            }
+
+            if (id && !isNaN(parseInt(id))) {
+                filters.sectionCode = parseInt(id);
+            }
+
+
+            if (date != null) {
+                let newDate = formatarData(date.toString() || "");
+                if (newDate) {
+                    filters.date = new Date(date.toString());
+                }
+
+            }
+
+            if (studentEnrolment != null) {
+                let enrolment = parseInt(studentEnrolment.toString());
+                if (!isNaN(enrolment) && enrolment > 0) {
+                    filters.studentEnrolment = parseInt(studentEnrolment.toString());
+                }
+
+            }
+
+
+            if (name) {
+                //@ts-ignore
+                filters.name = name;
+            }
             const data = await this.clientService.getAllPresencesOfSection(filters);
 
             return res.status(200).json(data);
+
+
         } catch (error) {
             console.log(error);
             return res.status(500).send();
@@ -153,22 +207,22 @@ export default class ClientController {
     }
 
     async updatePresence(req: Request, res: Response) {
-
-        const createPresenceDto = new CreatePresenceDto();
-        const { date, code, status, enrolment } = req.body;
-        createPresenceDto.date = date;
-        createPresenceDto.scheduleCode = code;
-        createPresenceDto.status = status;
-        createPresenceDto.studentEnrolment = enrolment;
-        const presence = plainToClass(CreatePresenceDto, createPresenceDto);
-        const errors = await validate(presence);
-
-        if (errors.length > 0) {
-            return res.status(400).json({ errors });
-        }
-
-
         try {
+            const createPresenceDto = new CreatePresenceDto();
+            const { date, code, status, enrolment } = req.body;
+            createPresenceDto.date = date;
+            createPresenceDto.scheduleCode = code;
+            createPresenceDto.status = status;
+            createPresenceDto.studentEnrolment = enrolment;
+            const presence = plainToClass(CreatePresenceDto, createPresenceDto);
+            const errors = await validate(presence);
+
+            if (errors.length > 0) {
+                return res.status(400).json({ errors });
+            }
+
+
+
             await this.clientService.createPresence(presence)
             return res.status(200).send();
         } catch (error) {
@@ -179,24 +233,24 @@ export default class ClientController {
     }
 
     async createPresence(req: Request, res: Response) {
-
-        const createPresenceDto = new CreatePresenceDto();
-        const { date, code, status, enrolment } = req.body;
-        const newDate = new Date(date);
-        newDate.setDate(newDate.getDate() + 1)
-        createPresenceDto.date = newDate;
-        createPresenceDto.scheduleCode = parseInt(code);
-        createPresenceDto.status = status;
-        createPresenceDto.studentEnrolment = enrolment;
-        const presence = plainToClass(CreatePresenceDto, createPresenceDto);
-        const errors = await validate(presence);
-
-        if (errors.length > 0) {
-            return res.status(400).json({ errors });
-        }
-
-
         try {
+            const createPresenceDto = new CreatePresenceDto();
+            const { date, code, status, enrolment } = req.body;
+            const newDate = new Date(date);
+            newDate.setDate(newDate.getDate() + 1)
+            createPresenceDto.date = newDate;
+            createPresenceDto.scheduleCode = parseInt(code);
+            createPresenceDto.status = status;
+            createPresenceDto.studentEnrolment = enrolment;
+            const presence = plainToClass(CreatePresenceDto, createPresenceDto);
+            const errors = await validate(presence);
+
+            if (errors.length > 0) {
+                return res.status(400).json({ errors });
+            }
+
+
+
             await this.clientService.createPresence(presence)
             return res.status(200).send();
         } catch (error) {
@@ -207,12 +261,21 @@ export default class ClientController {
     }
 
     async getDataSectionOfStudent(req: Request, res: Response) {
-        const { id } = req.params;
-        const { enrolment } = {
-            enrolment: 10286
-        }//todo 
-
         try {
+            const { id } = req.params;
+            let enrolment;
+            //@ts-ignore
+            if (req.user != null && req.user.enrolment != null) {
+                //@ts-ignore
+                enrolment = req.user.enrolment;
+            }
+            //@ts-ignore
+
+            if (!enrolment) {
+                return res.status(401).send();
+            }
+
+
             const data = await this.clientService.getDataSectionOfStudent(parseInt(id), enrolment);
 
             res.status(200).json(data);
@@ -226,33 +289,23 @@ export default class ClientController {
 
     async login(req: Request, res: Response) {
 
-        const { user, password } = req.body;
+        try {
+            const { user, password } = req.body;
 
-        if (!user || !password) {
-            res.status(401).send()
-        }
+            if (!user || !password) {
+                res.status(401).send()
+            }
 
-        if (user == "daniela" && password == "1234") {
+            const userLogin = await this.clientService.getUser(user, password);
 
-            return res.status(200).json({
-                login: "daniela",
-                token: "178935",
-                name: "Daniela",
-                enrolment: null,
-                code: 1
-            })
-        }
+            if (!userLogin) {
+                res.status(401).send()
+            }
 
-
-        if (user == "icaro" && password == "1234") {
-
-            return res.status(200).json({
-                login: "icaro",
-                token: "178935",
-                name: "Icaro",
-                enrolment: 10286,
-                code: null
-            })
+            return res.status(200).json(userLogin);
+        } catch (error) {
+            console.log(error);
+            res.status(500).send()
         }
     }
 

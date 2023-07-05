@@ -4,8 +4,8 @@ import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Max, MaxLength, Mi
 export class createStudentDto {
 
     @IsNotEmpty()
-    @MaxLength(7)
-    @MinLength(7)
+    @MaxLength(11)
+    @MinLength(11)
     @IsString()
     cpf: string
 

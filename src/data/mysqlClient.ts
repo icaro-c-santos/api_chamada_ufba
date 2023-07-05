@@ -27,6 +27,7 @@ export default class MysqlClient {
         return new Promise<RowDataPacket[]>((resolve, reject) => {
             const conn = this.connection();
             conn.query(sql, params, (error, results, fields) => {
+               
                 conn.end();
                 if (error) {
                     reject(error);

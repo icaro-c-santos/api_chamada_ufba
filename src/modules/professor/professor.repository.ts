@@ -24,7 +24,7 @@ export default class ProfessorRepository {
                     return;
                 }
 
-                const sqlPerson = `INSERT INTO persons (cpf,email,name,phone) VALUES (?,?,?,?)`;
+                const sqlPerson = `INSERT INTO persons (cpf, email, name, phone) VALUES (?, ?, ?, ?)`;
                 const sqlPersonParameters = Object.values(createProfessorDto);
                 connection.query(sqlPerson, sqlPersonParameters, (err, results) => {
                     if (err) {
@@ -39,7 +39,7 @@ export default class ProfessorRepository {
                         return;
                     }
 
-                    const sqlProfessor = `INSERT INTO professors (cpf) VALUES(?)`;
+                    const sqlProfessor = `INSERT INTO professors (cpf) VALUES (?)`;
                     const sqlProfessorParameters = [createProfessorDto.cpf];
                     connection.query(sqlProfessor, sqlProfessorParameters, (err, results) => {
                         if (err) {
@@ -50,26 +50,39 @@ export default class ProfessorRepository {
                             return;
                         }
 
-                        connection.commit((err) => {
+
+                        //@ts-ignore
+                        const code = results.insertId;
+
+                        const sqlUser = `INSERT INTO user (login, senha, token, codeProfessor) VALUES (?, ?, ?, ?)`;
+                        const sqlUserParameters = [createProfessorDto.cpf, "1234", code + 1234, code];
+                        connection.query(sqlUser, sqlUserParameters, (err, results) => {
                             if (err) {
                                 connection.rollback(() => {
                                     connection.end();
                                 });
                                 reject(err);
-                            } else {
-                                connection.end();
-
-                                const { insertId } = results as ResultSetHeader;
-                                resolve({
-                                    ...createProfessorDto, code: insertId
-                                });
+                                return;
                             }
+
+                            connection.commit((err) => {
+                                if (err) {
+                                    connection.rollback(() => {
+                                        connection.end();
+                                    });
+                                    reject(err);
+                                } else {
+                                    connection.end();
+                                    resolve({ ...createProfessorDto, code });
+                                }
+                            });
                         });
                     });
                 });
             });
         });
     }
+
 
     async getAllProfessor({ page = 1, pageSize = 25 }: Pagination = {}): Promise<Professor[]> {
 
@@ -95,9 +108,11 @@ export default class ProfessorRepository {
     }
 
     async getProfessorByCode(ProfessorEnrolment: string): Promise<Professor | null> {
-        const sql = `select * from professors inner join persons on professors.cpf = persons.cpf where professors.enrolments = ?;`
-        const [error, results, fields] = await this.mysqlClient.executeSQLQueryParams(sql, [ProfessorEnrolment]);
-        return results[0] as Professor || null;
+        const sql = `select * from professors inner join persons on professors.cpf = persons.cpf where professors.code = ?;`
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [ProfessorEnrolment]);
+
+        return results[0] as Professor | null
+
     }
 
     async updateProfessor(cpfProfessor: string, updateProfessorDto: UpdateProfessorDto): Promise<boolean> {

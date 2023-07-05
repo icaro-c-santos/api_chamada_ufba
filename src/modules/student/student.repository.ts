@@ -24,7 +24,7 @@ export default class StudentRepository {
                     return;
                 }
 
-                const sqlPerson = `INSERT INTO persons (cpf,email,name,phone) VALUES (?,?,?,?)`;
+                const sqlPerson = `INSERT INTO persons (cpf, email, name, phone) VALUES (?, ?, ?, ?)`;
                 const sqlPersonParameters = Object.values(createStudentDto);
                 connection.query(sqlPerson, sqlPersonParameters, (err, results) => {
                     if (err) {
@@ -39,7 +39,7 @@ export default class StudentRepository {
                         return;
                     }
 
-                    const sqlStudent = `INSERT INTO students (cpf) VALUES(?)`;
+                    const sqlStudent = `INSERT INTO students (cpf) VALUES (?)`;
                     const sqlStudentParameters = [createStudentDto.cpf];
                     connection.query(sqlStudent, sqlStudentParameters, (err, results) => {
                         if (err) {
@@ -50,26 +50,38 @@ export default class StudentRepository {
                             return;
                         }
 
-                        connection.commit((err) => {
+                        //@ts-ignore
+                        const enrolment = results.insertId;
+
+                        const sqlUser = `INSERT INTO user (login, senha, token, enrolment) VALUES (?, ?, ?, ?)`;
+                        const sqlUserParameters = [createStudentDto.cpf, "1234", enrolment + 1234, enrolment];
+                        connection.query(sqlUser, sqlUserParameters, (err, results) => {
                             if (err) {
                                 connection.rollback(() => {
                                     connection.end();
                                 });
                                 reject(err);
-                            } else {
-                                connection.end();
-
-                                const { insertId } = results as ResultSetHeader;
-                                resolve({
-                                    ...createStudentDto, enrolment: insertId
-                                });
+                                return;
                             }
+
+                            connection.commit((err) => {
+                                if (err) {
+                                    connection.rollback(() => {
+                                        connection.end();
+                                    });
+                                    reject(err);
+                                } else {
+                                    connection.end();
+                                    resolve({ ...createStudentDto, enrolment });
+                                }
+                            });
                         });
                     });
                 });
             });
         });
     }
+
 
     async getAllStudent({ page = 1, pageSize = 25 }: Pagination = {}): Promise<Student[]> {
 
@@ -95,9 +107,11 @@ export default class StudentRepository {
     }
 
     async getStudentByEnrolment(studentEnrolment: string): Promise<Student | null> {
-        const sql = `select * from students inner join persons on students.cpf = persons.cpf where students.enrolments = ?;`
-        const [error, results, fields] = await this.mysqlClient.executeSQLQueryParams(sql, [studentEnrolment]);
-        return results[0] as Student || null;
+        const sql = `select * from students inner join persons on students.cpf = persons.cpf where students.enrolment = ?;`
+        const results = await this.mysqlClient.executeSQLQueryParams(sql, [parseInt(studentEnrolment)]);
+
+
+        return results[0] as Student | null
     }
 
     async updateStudent(cpfStudent: string, updateStudentDto: UpdateStudentDto): Promise<boolean> {
@@ -131,5 +145,9 @@ export default class StudentRepository {
         const results = await this.mysqlClient.executeSQLQueryParams(sql, [studentCpf]) as unknown as ResultSetHeader;
         return results.affectedRows >= 1;
     }
+
+
+
+
 
 }
