@@ -62,12 +62,6 @@ CREATE TABLE `presences` (
 	PRIMARY KEY (`scheduleCode`,`studentEnrolment`,`date`)
 );
 
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk0` FOREIGN KEY (`status`) REFERENCES `status`(`id`) ON DELETE CASCADE;
-
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk1` FOREIGN KEY (`scheduleCode`) REFERENCES `schedules`(`code`) ON DELETE CASCADE;
-
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk2` FOREIGN KEY (`studentEnrolment`) REFERENCES `students_sections`(`studentEnrolment`) ON DELETE CASCADE;
-
 CREATE TABLE `status` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`value` varchar(255) NOT NULL,
@@ -79,6 +73,26 @@ CREATE TABLE `professors_sections` (
 	`sectionCode` INT NOT NULL,
 	PRIMARY KEY (`professorCode`,`sectionCode`)
 );
+
+
+CREATE TABLE `user` (
+    `login` varchar(255) NOT NULL,
+    `senha` varchar(255) NOT NULL,
+    `token` varchar(255) NOT NULL,
+    `enrolment` INT NULL,
+    `codeProfessor` INT NULL,
+    PRIMARY KEY (`login`),
+    CONSTRAINT `user_fk0` FOREIGN KEY (`enrolment`) REFERENCES `students`(`enrolment`) ON DELETE CASCADE,
+    CONSTRAINT `user_fk1` FOREIGN KEY (`codeProfessor`) REFERENCES `professors`(`code`) ON DELETE CASCADE
+);
+
+
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk0` FOREIGN KEY (`status`) REFERENCES `status`(`id`) ON DELETE CASCADE;
+
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk1` FOREIGN KEY (`scheduleCode`) REFERENCES `schedules`(`code`) ON DELETE CASCADE;
+
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk2` FOREIGN KEY (`studentEnrolment`) REFERENCES `students_sections`(`studentEnrolment`) ON DELETE CASCADE;
+
 
 INSERT INTO `banco_api`.`status` (`id`, `value`) VALUES ('1', 'presente');
 INSERT INTO `banco_api`.`status` (`id`, `value`) VALUES ('2', 'ausente');
@@ -103,14 +117,3 @@ ALTER TABLE `professors_sections` ADD CONSTRAINT `professors_sections_fk0` FOREI
 ALTER TABLE `professors_sections` ADD CONSTRAINT `professors_sections_fk1` FOREIGN KEY (`sectionCode`) REFERENCES `sections`(`code`) ON DELETE CASCADE;
 
 
-
-CREATE TABLE `user` (
-    `login` varchar(255) NOT NULL,
-    `senha` varchar(255) NOT NULL,
-    `token` varchar(255) NOT NULL,
-    `enrolment` INT NULL,
-    `codeProfessor` INT NULL,
-    PRIMARY KEY (`login`),
-    CONSTRAINT `user_fk0` FOREIGN KEY (`enrolment`) REFERENCES `students`(`enrolment`) ON DELETE CASCADE,
-    CONSTRAINT `user_fk1` FOREIGN KEY (`codeProfessor`) REFERENCES `professors`(`code`) ON DELETE CASCADE
-);
