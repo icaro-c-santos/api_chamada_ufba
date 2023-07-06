@@ -62,11 +62,11 @@ CREATE TABLE `presences` (
 	PRIMARY KEY (`scheduleCode`,`studentEnrolment`,`date`)
 );
 
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk0` FOREIGN KEY (`status`) REFERENCES `status`(`id`) ON DELETE CASCADE;
-
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk1` FOREIGN KEY (`scheduleCode`) REFERENCES `schedules`(`code`) ON DELETE CASCADE;
-
-ALTER TABLE `presences` ADD CONSTRAINT `presences_fk2` FOREIGN KEY (`studentEnrolment`) REFERENCES `students_sections`(`studentEnrolment`) ON DELETE CASCADE;
+CREATE TABLE `professors_sections` (
+	`professorCode` INT NOT NULL,
+	`sectionCode` INT NOT NULL,
+	PRIMARY KEY (`professorCode`,`sectionCode`)
+);
 
 CREATE TABLE `status` (
 	`id` INT NOT NULL AUTO_INCREMENT,
@@ -74,15 +74,15 @@ CREATE TABLE `status` (
 	PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `professors_sections` (
-	`professorCode` INT NOT NULL,
-	`sectionCode` INT NOT NULL,
-	PRIMARY KEY (`professorCode`,`sectionCode`)
-);
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk0` FOREIGN KEY (`status`) REFERENCES `status`(`id`) ON DELETE CASCADE;
 
-INSERT INTO `banco_api`.`status` (`id`, `value`) VALUES ('1', 'presente');
-INSERT INTO `banco_api`.`status` (`id`, `value`) VALUES ('2', 'ausente');
-INSERT INTO `banco_api`.`status` (`id`, `value`) VALUES ('3', 'abonado');
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk1` FOREIGN KEY (`scheduleCode`) REFERENCES `schedules`(`code`) ON DELETE CASCADE;
+
+ALTER TABLE `presences` ADD CONSTRAINT `presences_fk2` FOREIGN KEY (`studentEnrolment`) REFERENCES `students_sections`(`studentEnrolment`) ON DELETE CASCADE;
+
+INSERT INTO `status` (`id`, `value`) VALUES ('1', 'presente');
+INSERT INTO `status` (`id`, `value`) VALUES ('2', 'ausente');
+INSERT INTO `status` (`id`, `value`) VALUES ('3', 'abonado');
 
 ALTER TABLE `professors` ADD CONSTRAINT `professors_fk0` FOREIGN KEY (`cpf`) REFERENCES `persons`(`cpf`) ON DELETE CASCADE;
 

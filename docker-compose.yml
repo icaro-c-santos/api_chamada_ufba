@@ -17,8 +17,11 @@ services:
   api:
     build: .
     restart: always 
+    environment:
+      - DB_HOST=mysqldb
     ports: 
       - ${NODE_LOCAL_PORT}:${NODE_LOCAL_PORT}
 volumes:
   db:
+
 
