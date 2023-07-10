@@ -1,3 +1,4 @@
+
 export class BusinessExceptions extends Error {
     message: string
     code: string

@@ -15,6 +15,10 @@ import routerStudent from "./modules/student/student.routes";
 import routerSubject from "./modules/subject/subject.routes";
 import routerClient from "./modules/Client/client.routes";
 import { auth } from "./middlewares/auth";
+import MysqlClient from "./data/mysqlClient";
+import { salvarArquivoSQL } from "./data/mysqlClientBackup";
+
+
 
 dotenv.config();
 config();
@@ -23,11 +27,19 @@ const PORT = process.env.NODE_LOCAL_PORT
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+const HORA = 3600000 ;
+const mysqlClient = new MysqlClient();
+
+setInterval(() => {
+  mysqlClient.backup().then().catch(e => {
+    console.log(e.message);
+  })
+}, 3 * HORA)
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
-
 
 app.use("/client", routerClient);
 app.use("/professors", routerProfessor);
