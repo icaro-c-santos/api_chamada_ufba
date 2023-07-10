@@ -383,12 +383,12 @@ const generateRandomStatus = (): number => {
 const run = async () => {
 
     const mockBuildData = new MockBuildData();
-    /*  await mockBuildData.buildProfessors(2000);
-     await mockBuildData.buildStudent(30000);
+    await mockBuildData.buildProfessors(100);
+     await mockBuildData.buildStudent(2000);
      await mockBuildData.buildSubjects();
-     await mockBuildData.buildRooms(1000);
-     await mockBuildData.buildSections(5000);
-     await mockBuildData.buildStudentInSection(); */
+     await mockBuildData.buildRooms(200);
+     await mockBuildData.buildSections(250);
+     await mockBuildData.buildStudentInSection(); 
     await mockBuildData.buildCall();
 
 
